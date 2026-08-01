@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
+        /* ─── same styles as before, except we removed the .api-row ─── */
         :root {
             --bg: #0b0904;
             --panel: #171205;
@@ -17,17 +18,11 @@
             --line: #4a3200;
             --ink: #ffcf6e;
         }
-        * {
-            box-sizing: border-box;
-        }
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; }
+        html, body { margin:0; padding:0; }
         body {
             background:
-                repeating-linear-gradient(0deg, rgba(255, 176, 0, 0.025) 0px, rgba(255, 176, 0, 0.025) 1px, transparent 1px, transparent 3px),
+                repeating-linear-gradient(0deg, rgba(255,176,0,0.025) 0px, rgba(255,176,0,0.025) 1px, transparent 1px, transparent 3px),
                 radial-gradient(ellipse at 50% -10%, #241a05 0%, var(--bg) 55%);
             color: var(--ink);
             font-family: 'Share Tech Mono', monospace;
@@ -35,751 +30,345 @@
             padding: 28px 18px 60px;
             overflow-x: hidden;
         }
-        .wrap {
-            max-width: 1080px;
-            margin: 0 auto;
-        }
+        .wrap { max-width:1080px; margin:0 auto; }
 
-        /* ---- header ---- */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 14px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-        }
-        .sigil {
-            width: 52px;
-            height: 52px;
-            flex: none;
-        }
-        .title-block h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            letter-spacing: 4px;
-            font-size: 28px;
-            margin: 0;
-            color: var(--amber-bright);
-            text-shadow: 0 0 12px rgba(255, 176, 0, 0.55);
-        }
-        .title-block .sub {
-            font-size: 12px;
-            letter-spacing: 3px;
-            color: var(--amber-dim);
-            margin-top: 4px;
-        }
-        .clock {
-            margin-left: auto;
-            text-align: right;
-            font-size: 11px;
-            color: var(--amber-dim);
-            letter-spacing: 1px;
-            line-height: 1.6;
-        }
-        .clock b {
-            color: var(--amber);
-        }
+        /* header, console, triad, verdict, footer – unchanged, but we remove .api-row */
+        .header { display:flex; align-items:center; gap:18px; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:22px; flex-wrap:wrap; }
+        .sigil { width:52px; height:52px; flex:none; }
+        .title-block h1 { font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:4px; font-size:28px; margin:0; color:var(--amber-bright); text-shadow:0 0 12px rgba(255,176,0,0.55); }
+        .title-block .sub { font-size:12px; letter-spacing:3px; color:var(--amber-dim); margin-top:4px; }
+        .clock { margin-left:auto; text-align:right; font-size:11px; color:var(--amber-dim); letter-spacing:1px; line-height:1.6; }
+        .clock b { color:var(--amber); }
 
-        /* ---- console / input ---- */
         .console {
-            border: 1px solid var(--line);
-            background: linear-gradient(180deg, rgba(255, 176, 0, 0.04), transparent);
-            padding: 16px;
-            margin-bottom: 26px;
-            position: relative;
+            border:1px solid var(--line);
+            background:linear-gradient(180deg, rgba(255,176,0,0.04), transparent);
+            padding:16px;
+            margin-bottom:26px;
+            position:relative;
         }
         .console:before {
-            content: "INPUT // PROPOSAL FOR DELIBERATION";
-            position: absolute;
-            top: -9px;
-            left: 14px;
-            background: var(--bg);
-            padding: 0 8px;
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: var(--amber-dim);
+            content:"INPUT // PROPOSAL FOR DELIBERATION";
+            position:absolute; top:-9px; left:14px; background:var(--bg); padding:0 8px;
+            font-size:10px; letter-spacing:3px; color:var(--amber-dim);
         }
         textarea {
-            width: 100%;
-            min-height: 64px;
-            resize: vertical;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--ink);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 15px;
-            line-height: 1.5;
-            padding-top: 6px;
+            width:100%; min-height:64px; resize:vertical; background:transparent; border:none; outline:none;
+            color:var(--ink); font-family:'Share Tech Mono',monospace; font-size:15px; line-height:1.5; padding-top:6px;
         }
-        textarea::placeholder {
-            color: #6b5220;
-        }
+        textarea::placeholder { color:#6b5220; }
         .console-foot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            gap: 12px;
-            flex-wrap: wrap;
+            display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:12px; flex-wrap:wrap;
         }
-        .hint {
-            font-size: 11px;
-            color: var(--amber-dim);
-            letter-spacing: 1px;
-        }
-
-        /* ---- api key row ---- */
-        .api-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(74, 50, 0, 0.4);
-            flex-wrap: wrap;
-        }
-        .api-row label {
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: var(--amber-dim);
-            white-space: nowrap;
-        }
-        .api-row input {
-            flex: 1;
-            min-width: 160px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--line);
-            color: var(--ink);
-            padding: 6px 10px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            outline: none;
-            transition: border-color .25s;
-        }
-        .api-row input:focus {
-            border-color: var(--amber);
-        }
-        .api-row input::placeholder {
-            color: #5a4419;
-        }
-        .api-status {
-            font-size: 10px;
-            color: var(--amber-dim);
-            letter-spacing: 1px;
-        }
-        .api-status.valid {
-            color: var(--green);
-        }
-        .api-status.invalid {
-            color: var(--red);
-        }
+        .hint { font-size:11px; color:var(--amber-dim); letter-spacing:1px; }
 
         button#run {
-            background: var(--amber);
-            color: #150f00;
-            border: none;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            letter-spacing: 2px;
-            font-size: 13px;
-            padding: 11px 22px;
-            cursor: pointer;
-            clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
-            transition: transform .12s, box-shadow .12s;
-            flex-shrink: 0;
+            background:var(--amber); color:#150f00; border:none; font-family:'Orbitron',sans-serif; font-weight:700;
+            letter-spacing:2px; font-size:13px; padding:11px 22px; cursor:pointer;
+            clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px);
+            transition:transform .12s, box-shadow .12s; flex-shrink:0;
         }
-        button#run:hover:not(:disabled) {
-            box-shadow: 0 0 18px rgba(255, 176, 0, 0.6);
-            transform: translateY(-1px);
-        }
-        button#run:disabled {
-            background: #3a2c0c;
-            color: #8a6d2e;
-            cursor: default;
-        }
+        button#run:hover:not(:disabled){ box-shadow:0 0 18px rgba(255,176,0,0.6); transform:translateY(-1px); }
+        button#run:disabled{ background:#3a2c0c; color:#8a6d2e; cursor:default; }
 
-        /* ---- MAGI triad ---- */
-        .triad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-        @media (max-width: 760px) {
-            .triad {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        /* triad, node, etc. – same as before */
+        .triad { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px; }
+        @media (max-width:760px){ .triad{ grid-template-columns:1fr; } }
         .node {
-            position: relative;
-            border: 1px solid var(--line);
-            background: var(--panel);
-            padding: 18px 16px 16px;
-            min-height: 210px;
-            display: flex;
-            flex-direction: column;
-            transition: border-color .3s, box-shadow .3s;
+            position:relative; border:1px solid var(--line); background:var(--panel);
+            padding:18px 16px 16px; min-height:210px; display:flex; flex-direction:column;
+            transition:border-color .3s, box-shadow .3s;
         }
-        .node.processing {
-            border-color: var(--amber-dim);
-            animation: scan 1.4s linear infinite;
-        }
-        .node.approve {
-            border-color: var(--green);
-            box-shadow: 0 0 16px rgba(92, 255, 143, 0.12);
-        }
-        .node.conditional {
-            border-color: var(--amber);
-            box-shadow: 0 0 16px rgba(255, 176, 0, 0.15);
-        }
-        .node.reject {
-            border-color: var(--red);
-            box-shadow: 0 0 16px rgba(255, 59, 31, 0.15);
-        }
+        .node.processing { border-color:var(--amber-dim); animation:scan 1.4s linear infinite; }
+        .node.approve { border-color:var(--green); box-shadow:0 0 16px rgba(92,255,143,0.12); }
+        .node.conditional { border-color:var(--amber); box-shadow:0 0 16px rgba(255,176,0,0.15); }
+        .node.reject { border-color:var(--red); box-shadow:0 0 16px rgba(255,59,31,0.15); }
         @keyframes scan {
-            0% {
-                box-shadow: inset 0 -100% 0 0 rgba(255, 176, 0, 0.08);
-            }
-            50% {
-                box-shadow: inset 0 0 0 0 rgba(255, 176, 0, 0.08);
-            }
-            100% {
-                box-shadow: inset 0 -100% 0 0 rgba(255, 176, 0, 0.08);
-            }
+            0%{ box-shadow:inset 0 -100% 0 0 rgba(255,176,0,0.08); }
+            50%{ box-shadow:inset 0 0 0 0 rgba(255,176,0,0.08); }
+            100%{ box-shadow:inset 0 -100% 0 0 rgba(255,176,0,0.08); }
         }
-        .node-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 2px;
-        }
-        .node-name {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            letter-spacing: 2px;
-            color: var(--amber-bright);
-        }
-        .node-num {
-            font-size: 11px;
-            color: var(--amber-dim);
-        }
-        .node-role {
-            font-size: 10.5px;
-            letter-spacing: 2px;
-            color: var(--amber-dim);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-        .node-status {
-            font-size: 11px;
-            letter-spacing: 1px;
-            color: var(--amber-dim);
-            margin-bottom: 10px;
-        }
-        .node-status.processing {
-            color: var(--amber);
-        }
-        .node-status.approve {
-            color: var(--green);
-        }
-        .node-status.conditional {
-            color: var(--amber);
-        }
-        .node-status.reject {
-            color: var(--red);
-        }
-        .verdict-badge {
-            display: inline-block;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 2px;
-            padding: 4px 10px;
-            margin-bottom: 10px;
-            border: 1px solid currentColor;
-            width: fit-content;
-        }
-        .verdict-badge.approve {
-            color: var(--green);
-        }
-        .verdict-badge.conditional {
-            color: var(--amber);
-        }
-        .verdict-badge.reject {
-            color: var(--red);
-        }
-        .pct-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 59, 31, 0.35);
-            margin-bottom: 4px;
-            overflow: hidden;
-        }
-        .pct-bar-fill {
-            height: 100%;
-            background: var(--green);
-            transition: width .6s ease;
-        }
-        .pct-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-        .pct-label .a {
-            color: var(--green);
-        }
-        .pct-label .r {
-            color: var(--red);
-        }
-        .node-reason {
-            font-size: 12.5px;
-            line-height: 1.55;
-            color: #e0c07a;
-            flex: 1;
-        }
-        .dots:after {
-            content: '';
-            display: inline-block;
-            width: 1em;
-            animation: dots 1.2s steps(4, end) infinite;
-        }
-        @keyframes dots {
-            0% {
-                content: '';
-            }
-            25% {
-                content: '.';
-            }
-            50% {
-                content: '..';
-            }
-            75% {
-                content: '...';
-            }
-        }
+        .node-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
+        .node-name { font-family:'Orbitron',sans-serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--amber-bright); }
+        .node-num { font-size:11px; color:var(--amber-dim); }
+        .node-role { font-size:10.5px; letter-spacing:2px; color:var(--amber-dim); margin-bottom:12px; text-transform:uppercase; }
+        .node-status { font-size:11px; letter-spacing:1px; color:var(--amber-dim); margin-bottom:10px; }
+        .node-status.processing { color:var(--amber); }
+        .node-status.approve { color:var(--green); }
+        .node-status.conditional { color:var(--amber); }
+        .node-status.reject { color:var(--red); }
+        .pct-bar { width:100%; height:6px; background:rgba(255,59,31,0.35); margin-bottom:4px; overflow:hidden; }
+        .pct-bar-fill { height:100%; background:var(--green); transition:width .6s ease; }
+        .pct-label { display:flex; justify-content:space-between; font-size:11px; letter-spacing:1px; margin-bottom:10px; }
+        .pct-label .a { color:var(--green); }
+        .pct-label .r { color:var(--red); }
+        .node-reason { font-size:12.5px; line-height:1.55; color:#e0c07a; flex:1; }
+        .dots:after { content:''; display:inline-block; width:1em; animation:dots 1.2s steps(4,end) infinite; }
+        @keyframes dots { 0%{content:'';} 25%{content:'.';} 50%{content:'..';} 75%{content:'...';} }
 
-        /* ---- verdict panel ---- */
         .verdict-panel {
-            border: 1px solid var(--line);
-            background: var(--panel);
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            min-height: 110px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            border:1px solid var(--line); background:var(--panel); padding:20px; text-align:center; position:relative;
+            min-height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
         }
         .verdict-panel:before {
-            content: "MAGI CONSENSUS";
-            position: absolute;
-            top: -9px;
-            left: 14px;
-            background: var(--bg);
-            padding: 0 8px;
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: var(--amber-dim);
+            content:"MAGI CONSENSUS"; position:absolute; top:-9px; left:14px; background:var(--bg); padding:0 8px;
+            font-size:10px; letter-spacing:3px; color:var(--amber-dim);
         }
-        .tally {
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: var(--amber-dim);
-        }
-        .tally b {
-            color: var(--amber);
-        }
-        .final {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 26px;
-            letter-spacing: 5px;
-        }
-        .final.approve {
-            color: var(--green);
-            text-shadow: 0 0 18px rgba(92, 255, 143, 0.6);
-        }
-        .final.conditional {
-            color: var(--amber);
-            text-shadow: 0 0 18px rgba(255, 176, 0, 0.6);
-        }
-        .final.reject {
-            color: var(--red);
-            text-shadow: 0 0 18px rgba(255, 59, 31, 0.6);
-        }
-        .final.idle {
-            color: var(--amber-dim);
-            font-size: 15px;
-            letter-spacing: 3px;
-        }
+        .tally { font-size:12px; letter-spacing:2px; color:var(--amber-dim); }
+        .tally b { color:var(--amber); }
+        .final { font-family:'Orbitron',sans-serif; font-weight:900; font-size:26px; letter-spacing:5px; }
+        .final.approve { color:var(--green); text-shadow:0 0 18px rgba(92,255,143,0.6); }
+        .final.conditional { color:var(--amber); text-shadow:0 0 18px rgba(255,176,0,0.6); }
+        .final.reject { color:var(--red); text-shadow:0 0 18px rgba(255,59,31,0.6); }
+        .final.idle { color:var(--amber-dim); font-size:15px; letter-spacing:3px; }
 
-        .footer-note {
-            margin-top: 18px;
-            font-size: 10.5px;
-            color: #5a4419;
-            letter-spacing: 1px;
-            line-height: 1.6;
-            text-align: center;
-        }
-
-        .model-badge {
-            display: inline-block;
-            font-size: 9px;
-            letter-spacing: 1px;
-            color: var(--amber-dim);
-            border: 1px solid var(--line);
-            padding: 2px 10px;
-            border-radius: 0;
-            margin-left: 8px;
-            background: rgba(255, 176, 0, 0.04);
-            font-family: 'Share Tech Mono', monospace;
-        }
+        .footer-note { margin-top:18px; font-size:10.5px; color:#5a4419; letter-spacing:1px; line-height:1.6; text-align:center; }
+        .model-badge { display:inline-block; font-size:9px; letter-spacing:1px; color:var(--amber-dim); border:1px solid var(--line); padding:2px 10px; border-radius:0; margin-left:8px; background:rgba(255,176,0,0.04); font-family:'Share Tech Mono',monospace; }
     </style>
 </head>
 <body>
-    <div class="wrap">
+<div class="wrap">
 
-        <div class="header">
-            <svg class="sigil" viewBox="0 0 100 100">
-                <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="none" stroke="#ffb000" stroke-width="2"/>
-                <polygon points="50,20 79,35 79,65 50,80 21,65 21,35" fill="none" stroke="#ffb000" stroke-width="1" opacity="0.5"/>
-                <circle cx="50" cy="50" r="6" fill="#ffb000"/>
-            </svg>
-            <div class="title-block">
-                <h1>MAGI SYSTEM <span class="model-badge">via NARA ROUTER</span></h1>
-                <div class="sub">TRIUNE DECISION ARRAY &nbsp;/&nbsp; MELCHIOR &middot; BALTHASAR &middot; CASPER</div>
-            </div>
-            <div class="clock" id="clock">STATUS: <b>STANDBY</b></div>
+    <div class="header">
+        <svg class="sigil" viewBox="0 0 100 100">
+            <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="none" stroke="#ffb000" stroke-width="2"/>
+            <polygon points="50,20 79,35 79,65 50,80 21,65 21,35" fill="none" stroke="#ffb000" stroke-width="1" opacity="0.5"/>
+            <circle cx="50" cy="50" r="6" fill="#ffb000"/>
+        </svg>
+        <div class="title-block">
+            <h1>MAGI SYSTEM <span class="model-badge">via NARA ROUTER</span></h1>
+            <div class="sub">TRIUNE DECISION ARRAY &nbsp;/&nbsp; MELCHIOR &middot; BALTHASAR &middot; CASPER</div>
         </div>
-
-        <div class="console">
-            <textarea id="proposal" placeholder="Enter a proposal, decision, or question for the three personalities to deliberate on…"></textarea>
-
-            <!-- API KEY ROW -->
-            <div class="api-row">
-                <label for="apiKey">BYNARA KEY</label>
-                <input type="password" id="apiKey" placeholder="sk-… or paste your API key" spellcheck="false" autocomplete="off">
-                <span class="api-status" id="apiStatus">● not set</span>
-                <span style="font-size:10px;color:#5a4419;letter-spacing:0.5px;margin-left:auto;">model: agnes-2.0-flash</span>
-            </div>
-
-            <div class="console-foot">
-                <div class="hint">FINAL VERDICT = AVERAGE APPROVAL ACROSS ALL THREE NODES</div>
-                <button id="run">BEGIN DELIBERATION</button>
-            </div>
-        </div>
-
-        <div class="triad">
-            <div class="node" id="node-melchior">
-                <div class="node-head"><span class="node-name">MELCHIOR</span><span class="node-num">01</span></div>
-                <div class="node-role">the scientist</div>
-                <div class="node-status" id="status-melchior">STANDBY</div>
-                <div id="body-melchior"></div>
-            </div>
-            <div class="node" id="node-balthasar">
-                <div class="node-head"><span class="node-name">BALTHASAR</span><span class="node-num">02</span></div>
-                <div class="node-role">the mother</div>
-                <div class="node-status" id="status-balthasar">STANDBY</div>
-                <div id="body-balthasar"></div>
-            </div>
-            <div class="node" id="node-casper">
-                <div class="node-head"><span class="node-name">CASPER</span><span class="node-num">03</span></div>
-                <div class="node-role">the woman</div>
-                <div class="node-status" id="status-casper">STANDBY</div>
-                <div id="body-casper"></div>
-            </div>
-        </div>
-
-        <div class="verdict-panel">
-            <div class="tally" id="tally">AWAITING INPUT</div>
-            <div class="final idle" id="final">NO ACTIVE PROPOSAL</div>
-        </div>
-
-        <div class="footer-note">EACH PERSONALITY REASONS INDEPENDENTLY FROM ITS OWN ARCHETYPE. NO PERSONALITY SEES THE OTHERS' DELIBERATIONS.</div>
+        <div class="clock" id="clock">STATUS: <b>STANDBY</b></div>
     </div>
 
-    <script>
-        // ─── CONFIG ────────────────────────────────────────────────────────────
-        const DEFAULT_MODEL = 'agnes-2.0-flash';
+    <div class="console">
+        <textarea id="proposal" placeholder="Enter a proposal, decision, or question for the three personalities to deliberate on…"></textarea>
+        <div class="console-foot">
+            <div class="hint">FINAL VERDICT = AVERAGE APPROVAL ACROSS ALL THREE NODES</div>
+            <button id="run">BEGIN DELIBERATION</button>
+        </div>
+    </div>
 
-        // ─── PERSONAS ──────────────────────────────────────────────────────────
-        const personas = {
-            melchior: {
-                label: 'MELCHIOR-1',
-                system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
-            },
-            balthasar: {
-                label: 'BALTHASAR-2',
-                system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
-            },
-            casper: {
-                label: 'CASPER-3',
-                system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
-            }
-        };
+    <div class="triad">
+        <div class="node" id="node-melchior">
+            <div class="node-head"><span class="node-name">MELCHIOR</span><span class="node-num">01</span></div>
+            <div class="node-role">the scientist</div>
+            <div class="node-status" id="status-melchior">STANDBY</div>
+            <div id="body-melchior"></div>
+        </div>
+        <div class="node" id="node-balthasar">
+            <div class="node-head"><span class="node-name">BALTHASAR</span><span class="node-num">02</span></div>
+            <div class="node-role">the mother</div>
+            <div class="node-status" id="status-balthasar">STANDBY</div>
+            <div id="body-balthasar"></div>
+        </div>
+        <div class="node" id="node-casper">
+            <div class="node-head"><span class="node-name">CASPER</span><span class="node-num">03</span></div>
+            <div class="node-role">the woman</div>
+            <div class="node-status" id="status-casper">STANDBY</div>
+            <div id="body-casper"></div>
+        </div>
+    </div>
 
-        // ─── DOM REFS ──────────────────────────────────────────────────────────
-        const proposalEl = document.getElementById('proposal');
-        const runBtn = document.getElementById('run');
-        const clockEl = document.getElementById('clock');
-        const tallyEl = document.getElementById('tally');
-        const finalEl = document.getElementById('final');
-        const apiKeyInput = document.getElementById('apiKey');
-        const apiStatusEl = document.getElementById('apiStatus');
+    <div class="verdict-panel">
+        <div class="tally" id="tally">AWAITING INPUT</div>
+        <div class="final idle" id="final">NO ACTIVE PROPOSAL</div>
+    </div>
 
-        // ─── HELPERS ──────────────────────────────────────────────────────────
-        function setClock(text) {
-            clockEl.innerHTML = 'STATUS: <b>' + text + '</b>';
+    <div class="footer-note">EACH PERSONALITY REASONS INDEPENDENTLY FROM ITS OWN ARCHETYPE. NO PERSONALITY SEES THE OTHERS' DELIBERATIONS.</div>
+</div>
+
+<script>
+    // ─── CONFIG ────────────────────────────────────────────────────────────
+    const DEFAULT_MODEL = 'agnes-2.0-flash';
+
+    // ─── PERSONAS ──────────────────────────────────────────────────────────
+    const personas = {
+        melchior: {
+            label: 'MELCHIOR-1',
+            system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
+        },
+        balthasar: {
+            label: 'BALTHASAR-2',
+            system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
+        },
+        casper: {
+            label: 'CASPER-3',
+            system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
         }
+    };
 
-        function setStatus(key, cls, text) {
-            const el = document.getElementById('status-' + key);
-            el.className = 'node-status ' + cls;
-            el.textContent = text;
-        }
+    // ─── DOM REFS ──────────────────────────────────────────────────────────
+    const proposalEl = document.getElementById('proposal');
+    const runBtn = document.getElementById('run');
+    const clockEl = document.getElementById('clock');
+    const tallyEl = document.getElementById('tally');
+    const finalEl = document.getElementById('final');
 
-        function renderResult(key, pct, reasoning) {
-            const node = document.getElementById('node-' + key);
-            const cls = pct >= 50 ? 'approve' : 'reject';
-            node.className = 'node ' + cls;
-            setStatus(key, cls, 'VERDICT LOCKED');
-            document.getElementById('body-' + key).innerHTML =
-                '<div class="pct-bar"><div class="pct-bar-fill" style="width:' + pct + '%"></div></div>' +
-                '<div class="pct-label"><span class="a">' + pct + '% APPROVE</span><span class="r">' + (100 - pct) +
-                '% REJECT</span></div>' +
-                '<div class="node-reason">' + reasoning + '</div>';
-        }
+    function setClock(text) {
+        clockEl.innerHTML = 'STATUS: <b>' + text + '</b>';
+    }
 
-        function getApiKey() {
-            return apiKeyInput.value.trim();
-        }
+    function setStatus(key, cls, text) {
+        const el = document.getElementById('status-' + key);
+        el.className = 'node-status ' + cls;
+        el.textContent = text;
+    }
 
-        function updateApiStatus() {
-            const key = getApiKey();
-            if (!key) {
-                apiStatusEl.className = 'api-status';
-                apiStatusEl.textContent = '● not set';
-                return false;
-            }
-            if (key.length < 8) {
-                apiStatusEl.className = 'api-status invalid';
-                apiStatusEl.textContent = '● too short';
-                return false;
-            }
-            apiStatusEl.className = 'api-status valid';
-            apiStatusEl.textContent = '● ready';
-            return true;
-        }
+    function renderResult(key, pct, reasoning) {
+        const node = document.getElementById('node-' + key);
+        const cls = pct >= 50 ? 'approve' : 'reject';
+        node.className = 'node ' + cls;
+        setStatus(key, cls, 'VERDICT LOCKED');
+        document.getElementById('body-' + key).innerHTML =
+            '<div class="pct-bar"><div class="pct-bar-fill" style="width:' + pct + '%"></div></div>' +
+            '<div class="pct-label"><span class="a">' + pct + '% APPROVE</span><span class="r">' + (100 - pct) +
+            '% REJECT</span></div>' +
+            '<div class="node-reason">' + reasoning + '</div>';
+    }
 
-        // ─── ROBUST JSON EXTRACTION ───────────────────────────────────────────
-        function extractJSON(text) {
-            // Remove markdown code fences (```json or ```) from start/end
-            let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-
-            // Try to parse directly
-            try {
-                JSON.parse(cleaned);
-                return cleaned;
-            } catch (_) {
-                // If that fails, try to find the first { and last } in the string
-                const firstBrace = cleaned.indexOf('{');
-                const lastBrace = cleaned.lastIndexOf('}');
-                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-                    const candidate = cleaned.substring(firstBrace, lastBrace + 1);
-                    try {
-                        JSON.parse(candidate);
-                        return candidate;
-                    } catch (__) {
-                        // Still invalid – throw with context
-                        throw new Error('Could not extract valid JSON from response: ' + text.substring(0, 200));
-                    }
-                } else {
-                    throw new Error('No JSON object found in response: ' + text.substring(0, 200));
+    // ─── ROBUST JSON EXTRACTION ───────────────────────────────────────────
+    function extractJSON(text) {
+        let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+        try {
+            JSON.parse(cleaned);
+            return cleaned;
+        } catch (_) {
+            const firstBrace = cleaned.indexOf('{');
+            const lastBrace = cleaned.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                const candidate = cleaned.substring(firstBrace, lastBrace + 1);
+                try {
+                    JSON.parse(candidate);
+                    return candidate;
+                } catch (__) {
+                    throw new Error('Could not extract valid JSON: ' + text.substring(0, 200));
                 }
-            }
-        }
-
-        // ─── NARA ROUTER CALL (via Vercel proxy) ────────────────────────────
-        async function askPersona(key, proposal) {
-            const p = personas[key];
-            const apiKey = getApiKey();
-
-            if (!apiKey) {
-                setStatus(key, 'reject', 'NO API KEY');
-                document.getElementById('body-' + key).innerHTML =
-                    '<div class="node-reason" style="color:var(--red)">Please enter your BYNARA API key.</div>';
-                return null;
-            }
-
-            const node = document.getElementById('node-' + key);
-            node.className = 'node processing';
-            setStatus(key, 'processing', 'ANALYZING');
-            document.getElementById('body-' + key).innerHTML =
-                '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
-
-            try {
-                // Call your own proxy endpoint (Vercel serverless function)
-                const response = await fetch('/api/proxy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        apiKey: apiKey,
-                        model: DEFAULT_MODEL,
-                        messages: [
-                            { role: 'system', content: p.system },
-                            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-                        ]
-                    })
-                });
-
-                // Parse the proxy response
-                const data = await response.json();
-
-                if (!response.ok) {
-                    const errMsg = data.error?.message || data.error || 'HTTP ' + response.status;
-                    throw new Error('Proxy error: ' + errMsg);
-                }
-
-                // Extract the assistant's reply
-                const raw = data.choices?.[0]?.message?.content || '';
-                if (!raw) throw new Error('Empty response from Nara Router');
-
-                // Extract JSON from the raw content
-                const jsonStr = extractJSON(raw);
-                const parsed = JSON.parse(jsonStr);
-
-                let pct = Math.round(Number(parsed.approve_pct));
-                if (isNaN(pct)) pct = 50;
-                pct = Math.max(0, Math.min(100, pct));
-
-                renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
-                return pct;
-
-            } catch (err) {
-                setStatus(key, 'reject', 'LINK ERROR');
-                document.getElementById('body-' + key).innerHTML =
-                    '<div class="node-reason" style="color:var(--red)">' + (err.message || err) + '</div>';
-                return null;
-            }
-        }
-
-        // ─── FINALIZE ──────────────────────────────────────────────────────────
-        function finalize(votes) {
-            const valid = votes.filter(v => v !== null);
-            if (!valid.length) {
-                tallyEl.textContent = 'ALL NODES UNREACHABLE';
-                finalEl.className = 'final reject';
-                finalEl.textContent = 'CONSENSUS FAILED';
-                setClock('LINK ERROR');
-                return;
-            }
-            const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
-            tallyEl.innerHTML =
-                '<b>' + avg + '% APPROVE</b> &mdash; ' + (100 - avg) + '% REJECT &nbsp;(' + valid.length +
-                '/3 nodes reporting)';
-
-            let outcome, cls;
-            if (avg >= 50) {
-                outcome = 'PROPOSAL APPROVED';
-                cls = 'approve';
             } else {
-                outcome = 'PROPOSAL REJECTED';
-                cls = 'reject';
+                throw new Error('No JSON object found: ' + text.substring(0, 200));
             }
-            finalEl.className = 'final ' + cls;
-            finalEl.textContent = outcome;
-            setClock('CONSENSUS REACHED');
         }
+    }
 
-        // ─── MAIN ACTION ──────────────────────────────────────────────────────
-        async function runDeliberation() {
-            const proposal = proposalEl.value.trim();
-            if (!proposal) {
-                proposalEl.focus();
-                return;
-            }
+    // ─── CALL PROXY (no API key sent from client) ─────────────────────────
+    async function askPersona(key, proposal) {
+        const p = personas[key];
 
-            const apiKey = getApiKey();
-            if (!apiKey) {
-                apiKeyInput.focus();
-                apiKeyInput.style.borderColor = 'var(--red)';
-                setTimeout(() => { apiKeyInput.style.borderColor = ''; }, 1800);
-                return;
-            }
-            if (apiKey.length < 8) {
-                apiStatusEl.className = 'api-status invalid';
-                apiStatusEl.textContent = '● key too short';
-                apiKeyInput.focus();
-                return;
-            }
-            updateApiStatus();
+        const node = document.getElementById('node-' + key);
+        node.className = 'node processing';
+        setStatus(key, 'processing', 'ANALYZING');
+        document.getElementById('body-' + key).innerHTML =
+            '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
 
-            runBtn.disabled = true;
-            runBtn.textContent = 'DELIBERATING…';
-            setClock('DELIBERATION IN PROGRESS');
-            tallyEl.textContent = 'COMPUTING…';
-            finalEl.className = 'final idle';
-            finalEl.textContent = 'AWAITING CONSENSUS';
-
-            // Reset all nodes to standby
-            ['melchior', 'balthasar', 'casper'].forEach(k => {
-                document.getElementById('node-' + k).className = 'node';
-                setStatus(k, '', 'STANDBY');
-                document.getElementById('body-' + k).innerHTML = '';
+        try {
+            const response = await fetch('/api/proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: DEFAULT_MODEL,
+                    messages: [
+                        { role: 'system', content: p.system },
+                        { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
+                    ]
+                })
             });
 
-            const keys = Object.keys(personas);
-            const votes = await Promise.all(keys.map(k => askPersona(k, proposal)));
-            finalize(votes);
+            const data = await response.json();
 
-            runBtn.disabled = false;
-            runBtn.textContent = 'BEGIN DELIBERATION';
+            if (!response.ok) {
+                const errMsg = data.error?.message || data.error || 'HTTP ' + response.status;
+                throw new Error('Proxy error: ' + errMsg);
+            }
+
+            const raw = data.choices?.[0]?.message?.content || '';
+            if (!raw) throw new Error('Empty response from Nara Router');
+
+            const jsonStr = extractJSON(raw);
+            const parsed = JSON.parse(jsonStr);
+
+            let pct = Math.round(Number(parsed.approve_pct));
+            if (isNaN(pct)) pct = 50;
+            pct = Math.max(0, Math.min(100, pct));
+
+            renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
+            return pct;
+
+        } catch (err) {
+            setStatus(key, 'reject', 'LINK ERROR');
+            document.getElementById('body-' + key).innerHTML =
+                '<div class="node-reason" style="color:var(--red)">' + (err.message || err) + '</div>';
+            return null;
+        }
+    }
+
+    // ─── FINALIZE ──────────────────────────────────────────────────────────
+    function finalize(votes) {
+        const valid = votes.filter(v => v !== null);
+        if (!valid.length) {
+            tallyEl.textContent = 'ALL NODES UNREACHABLE';
+            finalEl.className = 'final reject';
+            finalEl.textContent = 'CONSENSUS FAILED';
+            setClock('LINK ERROR');
+            return;
+        }
+        const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
+        tallyEl.innerHTML =
+            '<b>' + avg + '% APPROVE</b> &mdash; ' + (100 - avg) + '% REJECT &nbsp;(' + valid.length +
+            '/3 nodes reporting)';
+
+        let outcome, cls;
+        if (avg >= 50) {
+            outcome = 'PROPOSAL APPROVED';
+            cls = 'approve';
+        } else {
+            outcome = 'PROPOSAL REJECTED';
+            cls = 'reject';
+        }
+        finalEl.className = 'final ' + cls;
+        finalEl.textContent = outcome;
+        setClock('CONSENSUS REACHED');
+    }
+
+    // ─── MAIN ACTION ──────────────────────────────────────────────────────
+    async function runDeliberation() {
+        const proposal = proposalEl.value.trim();
+        if (!proposal) {
+            proposalEl.focus();
+            return;
         }
 
-        // ─── EVENT BINDING ────────────────────────────────────────────────────
-        runBtn.addEventListener('click', runDeliberation);
+        runBtn.disabled = true;
+        runBtn.textContent = 'DELIBERATING…';
+        setClock('DELIBERATION IN PROGRESS');
+        tallyEl.textContent = 'COMPUTING…';
+        finalEl.className = 'final idle';
+        finalEl.textContent = 'AWAITING CONSENSUS';
 
-        proposalEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                runBtn.click();
-            }
+        // Reset nodes
+        ['melchior', 'balthasar', 'casper'].forEach(k => {
+            document.getElementById('node-' + k).className = 'node';
+            setStatus(k, '', 'STANDBY');
+            document.getElementById('body-' + k).innerHTML = '';
         });
 
-        apiKeyInput.addEventListener('input', updateApiStatus);
-        apiKeyInput.addEventListener('blur', updateApiStatus);
+        const keys = Object.keys(personas);
+        const votes = await Promise.all(keys.map(k => askPersona(k, proposal)));
+        finalize(votes);
 
-        // initial status
-        updateApiStatus();
+        runBtn.disabled = false;
+        runBtn.textContent = 'BEGIN DELIBERATION';
+    }
 
-        // ─── PERSIST API KEY IN SESSIONSTORAGE ──────────────────────────────
-        (function loadStoredKey() {
-            try {
-                const stored = sessionStorage.getItem('magi_bynara_key');
-                if (stored) {
-                    apiKeyInput.value = stored;
-                    updateApiStatus();
-                }
-            } catch (_) { /* ignore */ }
-        })();
+    // ─── EVENT BINDING ────────────────────────────────────────────────────
+    runBtn.addEventListener('click', runDeliberation);
 
-        document.addEventListener('click', function saveKey() {
-            const key = getApiKey();
-            if (key && key.length >= 8) {
-                try {
-                    sessionStorage.setItem('magi_bynara_key', key);
-                } catch (_) { /* ignore */ }
-            }
-        });
-    </script>
+    proposalEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            runBtn.click();
+        }
+    });
+</script>
 </body>
 </html>
