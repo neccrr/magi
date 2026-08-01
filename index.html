@@ -583,71 +583,67 @@
 
         // ─── NARA ROUTER CALL ──────────────────────────────────────────────
         async function askPersona(key, proposal) {
-            const p = personas[key];
-            const apiKey = getApiKey();
+  const p = personas[key];
+  const apiKey = getApiKey();
 
-            if (!apiKey) {
-                setStatus(key, 'reject', 'NO API KEY');
-                document.getElementById('body-' + key).innerHTML =
-                    '<div class="node-reason" style="color:var(--red)">Please enter your BYNARA API key in the console.</div>';
-                return null;
-            }
+  if (!apiKey) {
+    setStatus(key, 'reject', 'NO API KEY');
+    document.getElementById('body-' + key).innerHTML =
+      '<div class="node-reason" style="color:var(--red)">Please enter your BYNARA API key.</div>';
+    return null;
+  }
 
-            const node = document.getElementById('node-' + key);
-            node.className = 'node processing';
-            setStatus(key, 'processing', 'ANALYZING');
-            document.getElementById('body-' + key).innerHTML =
-                '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
+  const node = document.getElementById('node-' + key);
+  node.className = 'node processing';
+  setStatus(key, 'processing', 'ANALYZING');
+  document.getElementById('body-' + key).innerHTML =
+    '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
 
-            try {
-                const response = await fetch(NARA_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + apiKey
-                    },
-                    body: JSON.stringify({
-                        model: DEFAULT_MODEL,
-                        messages: [
-                            { role: 'system', content: p.system },
-                            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-                        ],
-                        max_tokens: 1000,
-                        temperature: 0.7
-                    })
-                });
+  try {
+    // ✅ Call your own proxy instead of the external URL
+    const response = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: apiKey,
+        model: DEFAULT_MODEL,
+        messages: [
+          { role: 'system', content: p.system },
+          { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
+        ]
+      })
+    });
 
-                if (!response.ok) {
-                    let errMsg = 'HTTP ' + response.status;
-                    try {
-                        const errData = await response.json();
-                        errMsg += ' — ' + (errData.error?.message || errData.error || JSON.stringify(errData));
-                    } catch (_) { /* ignore */ }
-                    throw new Error(errMsg);
-                }
+    if (!response.ok) {
+      let errMsg = 'HTTP ' + response.status;
+      try {
+        const errData = await response.json();
+        errMsg += ' — ' + (errData.error?.message || errData.error || JSON.stringify(errData));
+      } catch (_) {}
+      throw new Error(errMsg);
+    }
 
-                const data = await response.json();
-                const raw = data.choices?.[0]?.message?.content || '';
-                if (!raw) throw new Error('Empty response from Nara Router');
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content || '';
+    if (!raw) throw new Error('Empty response from Nara Router');
 
-                const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
-                const parsed = JSON.parse(cleaned);
+    const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
+    const parsed = JSON.parse(cleaned);
 
-                let pct = Math.round(Number(parsed.approve_pct));
-                if (isNaN(pct)) pct = 50;
-                pct = Math.max(0, Math.min(100, pct));
+    let pct = Math.round(Number(parsed.approve_pct));
+    if (isNaN(pct)) pct = 50;
+    pct = Math.max(0, Math.min(100, pct));
 
-                renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
-                return pct;
+    renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
+    return pct;
 
-            } catch (err) {
-                setStatus(key, 'reject', 'LINK ERROR');
-                document.getElementById('body-' + key).innerHTML =
-                    '<div class="node-reason" style="color:var(--red)">Nara Router error: ' + (err.message || err) +
-                    '</div>';
-                return null;
-            }
-        }
+  } catch (err) {
+    setStatus(key, 'reject', 'LINK ERROR');
+    document.getElementById('body-' + key).innerHTML =
+      '<div class="node-reason" style="color:var(--red)">Proxy error: ' + (err.message || err) + '</div>';
+    return null;
+  }
+}
 
         // ─── FINALIZE ──────────────────────────────────────────────────────────
         function finalize(votes) {
