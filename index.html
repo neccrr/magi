@@ -509,7 +509,6 @@
 
     <script>
         // ─── CONFIG ────────────────────────────────────────────────────────────
-        const NARA_ENDPOINT = 'https://router.bynara.id/v1/chat/completions';
         const DEFAULT_MODEL = 'agnes-2.0-flash';
 
         // ─── PERSONAS ──────────────────────────────────────────────────────────
@@ -581,69 +580,97 @@
             return true;
         }
 
-        // ─── NARA ROUTER CALL ──────────────────────────────────────────────
+        // ─── ROBUST JSON EXTRACTION ───────────────────────────────────────────
+        function extractJSON(text) {
+            // Remove markdown code fences (```json or ```) from start/end
+            let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+            // Try to parse directly
+            try {
+                JSON.parse(cleaned);
+                return cleaned;
+            } catch (_) {
+                // If that fails, try to find the first { and last } in the string
+                const firstBrace = cleaned.indexOf('{');
+                const lastBrace = cleaned.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                    const candidate = cleaned.substring(firstBrace, lastBrace + 1);
+                    try {
+                        JSON.parse(candidate);
+                        return candidate;
+                    } catch (__) {
+                        // Still invalid – throw with context
+                        throw new Error('Could not extract valid JSON from response: ' + text.substring(0, 200));
+                    }
+                } else {
+                    throw new Error('No JSON object found in response: ' + text.substring(0, 200));
+                }
+            }
+        }
+
+        // ─── NARA ROUTER CALL (via Vercel proxy) ────────────────────────────
         async function askPersona(key, proposal) {
-  const p = personas[key];
-  const apiKey = getApiKey();
+            const p = personas[key];
+            const apiKey = getApiKey();
 
-  if (!apiKey) {
-    setStatus(key, 'reject', 'NO API KEY');
-    document.getElementById('body-' + key).innerHTML =
-      '<div class="node-reason" style="color:var(--red)">Please enter your BYNARA API key.</div>';
-    return null;
-  }
+            if (!apiKey) {
+                setStatus(key, 'reject', 'NO API KEY');
+                document.getElementById('body-' + key).innerHTML =
+                    '<div class="node-reason" style="color:var(--red)">Please enter your BYNARA API key.</div>';
+                return null;
+            }
 
-  const node = document.getElementById('node-' + key);
-  node.className = 'node processing';
-  setStatus(key, 'processing', 'ANALYZING');
-  document.getElementById('body-' + key).innerHTML =
-    '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
+            const node = document.getElementById('node-' + key);
+            node.className = 'node processing';
+            setStatus(key, 'processing', 'ANALYZING');
+            document.getElementById('body-' + key).innerHTML =
+                '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
 
-  try {
-    // ✅ Call your own proxy instead of the external URL
-    const response = await fetch('/api/proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        apiKey: apiKey,
-        model: DEFAULT_MODEL,
-        messages: [
-          { role: 'system', content: p.system },
-          { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-        ]
-      })
-    });
+            try {
+                // Call your own proxy endpoint (Vercel serverless function)
+                const response = await fetch('/api/proxy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        model: DEFAULT_MODEL,
+                        messages: [
+                            { role: 'system', content: p.system },
+                            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
+                        ]
+                    })
+                });
 
-    if (!response.ok) {
-      let errMsg = 'HTTP ' + response.status;
-      try {
-        const errData = await response.json();
-        errMsg += ' — ' + (errData.error?.message || errData.error || JSON.stringify(errData));
-      } catch (_) {}
-      throw new Error(errMsg);
-    }
+                // Parse the proxy response
+                const data = await response.json();
 
-    const data = await response.json();
-    const raw = data.choices?.[0]?.message?.content || '';
-    if (!raw) throw new Error('Empty response from Nara Router');
+                if (!response.ok) {
+                    const errMsg = data.error?.message || data.error || 'HTTP ' + response.status;
+                    throw new Error('Proxy error: ' + errMsg);
+                }
 
-    const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
-    const parsed = JSON.parse(cleaned);
+                // Extract the assistant's reply
+                const raw = data.choices?.[0]?.message?.content || '';
+                if (!raw) throw new Error('Empty response from Nara Router');
 
-    let pct = Math.round(Number(parsed.approve_pct));
-    if (isNaN(pct)) pct = 50;
-    pct = Math.max(0, Math.min(100, pct));
+                // Extract JSON from the raw content
+                const jsonStr = extractJSON(raw);
+                const parsed = JSON.parse(jsonStr);
 
-    renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
-    return pct;
+                let pct = Math.round(Number(parsed.approve_pct));
+                if (isNaN(pct)) pct = 50;
+                pct = Math.max(0, Math.min(100, pct));
 
-  } catch (err) {
-    setStatus(key, 'reject', 'LINK ERROR');
-    document.getElementById('body-' + key).innerHTML =
-      '<div class="node-reason" style="color:var(--red)">Proxy error: ' + (err.message || err) + '</div>';
-    return null;
-  }
-}
+                renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
+                return pct;
+
+            } catch (err) {
+                setStatus(key, 'reject', 'LINK ERROR');
+                document.getElementById('body-' + key).innerHTML =
+                    '<div class="node-reason" style="color:var(--red)">' + (err.message || err) + '</div>';
+                return null;
+            }
+        }
 
         // ─── FINALIZE ──────────────────────────────────────────────────────────
         function finalize(votes) {
@@ -734,8 +761,7 @@
         // initial status
         updateApiStatus();
 
-        // ─── PERSIST API KEY IN SESSIONSTORAGE (optional convenience) ──────
-        // Load from sessionStorage if present
+        // ─── PERSIST API KEY IN SESSIONSTORAGE ──────────────────────────────
         (function loadStoredKey() {
             try {
                 const stored = sessionStorage.getItem('magi_bynara_key');
@@ -746,7 +772,6 @@
             } catch (_) { /* ignore */ }
         })();
 
-        // Save on successful deliberation (so user doesn't have to re-type)
         document.addEventListener('click', function saveKey() {
             const key = getApiKey();
             if (key && key.length >= 8) {
