@@ -1,15 +1,8 @@
-// api/proxy.js
 export default async function handler(req, res) {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { messages, model, apiKey } = req.body;
-
-  if (!apiKey) {
-    return res.status(400).json({ error: 'Missing API key' });
-  }
+  if (!apiKey) return res.status(400).json({ error: 'Missing API key' });
 
   try {
     const response = await fetch('https://router.bynara.id/v1/chat/completions', {
@@ -27,8 +20,6 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-
-    // Forward the status code and response
     res.status(response.status).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
