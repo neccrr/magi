@@ -23,10 +23,10 @@
     color:var(--orange);
     min-height:100vh;
     display:flex; align-items:center; justify-content:center;
-    padding:18px;
+    padding:10px;
   }
   .screen{
-    width:100%; max-width:900px;
+    width:100%; max-width:1180px;
     border:2px solid var(--orange);
     box-shadow:0 0 0 1px #000, 0 0 22px rgba(247,131,0,0.25), inset 0 0 30px rgba(247,131,0,0.04);
     padding:6px;
@@ -80,13 +80,17 @@
   .frame-rule{ stroke:var(--orange); stroke-width:2; fill:none; }
   .dbl-line{ stroke:var(--orange); stroke-width:2; }
 
-  .caption-fo{ overflow:visible; }
-  .caption{
-    font-family:'Share Tech Mono',monospace; font-size:10.5px; line-height:1.35;
-    color:#07181c; text-align:center; padding:0 10px;
+  .persona-pct{
+    font-family:'Share Tech Mono',monospace; font-weight:700; font-size:15px;
+    text-anchor:middle; letter-spacing:0.5px;
   }
-  .caption b{ display:block; font-size:12px; margin-bottom:2px; }
-  .caption.err{ color:#3a0300; }
+  .persona-pct .a{ fill:#0a3b2e; }
+  .persona-pct .r{ fill:#3a0300; }
+  .persona-pct .sep{ fill:#07181c; opacity:.5; }
+  .persona-status{
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px;
+    text-anchor:middle; fill:#07181c; opacity:.75;
+  }
 
   .info-box{ fill:#020806; stroke:var(--cyan-glow); stroke-width:2; }
   .info-box.pulse{ animation:ipulse 0.9s ease-in-out infinite; }
@@ -94,11 +98,12 @@
 
   /* bottom bars, outside svg */
   .bar-row{
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:12px;
     border-top:1px solid var(--orange-dim);
-    padding:9px 2px;
-    font-size:13px;
+    padding:11px 2px;
+    font-size:13.5px;
   }
+  .bar-row:last-of-type{ padding-bottom:14px; }
   .bar-label{ color:var(--orange); white-space:nowrap; letter-spacing:1px; }
   .bar-fill{
     flex:1; border:1px solid var(--orange-dim); height:20px; position:relative;
@@ -119,8 +124,8 @@
 
   /* console log */
   .log{
-    border:1px solid var(--orange-dim); margin:10px 0 14px; padding:10px 12px;
-    font-size:12px; line-height:1.7; min-height:78px; max-height:180px; overflow-y:auto;
+    border:1px solid var(--orange-dim); margin:12px 0 16px; padding:12px 14px;
+    font-size:12.5px; line-height:1.75; min-height:110px; max-height:240px; overflow-y:auto;
   }
   .log-line{ color:#e0b064; }
   .log-line b{ color:var(--orange); }
@@ -172,24 +177,21 @@
 
     <!-- BALTHASAR (top) -->
     <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209"/>
-    <text x="400" y="140" class="persona-name">BALTHASAR&#8226;2</text>
-    <foreignObject class="caption-fo" x="330" y="150" width="140" height="55">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-balthasar">the mother</div>
-    </foreignObject>
+    <text x="400" y="130" class="persona-name">BALTHASAR&#8226;2</text>
+    <text x="400" y="152" class="persona-status" id="status-balthasar">the mother</text>
+    <text x="400" y="178" class="persona-pct" id="pct-balthasar"></text>
 
     <!-- CASPER (bottom left) -->
     <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386"/>
-    <text x="150" y="305" class="persona-name">CASPER&#8226;3</text>
-    <foreignObject class="caption-fo" x="55" y="315" width="220" height="65">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-casper">the woman</div>
-    </foreignObject>
+    <text x="150" y="300" class="persona-name">CASPER&#8226;3</text>
+    <text x="150" y="322" class="persona-status" id="status-casper">the woman</text>
+    <text x="150" y="348" class="persona-pct" id="pct-casper"></text>
 
     <!-- MELCHIOR (bottom right) -->
     <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316"/>
-    <text x="650" y="305" class="persona-name">MELCHIOR&#8226;1</text>
-    <foreignObject class="caption-fo" x="530" y="315" width="220" height="65">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-melchior">the scientist</div>
-    </foreignObject>
+    <text x="650" y="300" class="persona-name">MELCHIOR&#8226;1</text>
+    <text x="650" y="322" class="persona-status" id="status-melchior">the scientist</text>
+    <text x="650" y="348" class="persona-pct" id="pct-melchior"></text>
 
     <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
   </svg>
@@ -205,7 +207,7 @@
   <div class="bar-row">
     <span class="bar-label">input:</span>
     <div class="bar-fill">
-      <input id="question" type="text" placeholder="enter a proposal, decision, or question to deliberate on…" autocomplete="off">
+      <input id="question" type="text" placeholder="enter proposal or decision to deliberate" autocomplete="off">
     </div>
     <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
   </div>
@@ -259,17 +261,26 @@
     document.getElementById('panel-' + key).setAttribute('class', 'panel ' + state);
   }
 
-  function setCaption(key, html, err) {
-    const el = document.getElementById('cap-' + key);
-    el.className = 'caption' + (err ? ' err' : '');
-    el.innerHTML = html;
+  function setStatus(key, text) {
+    document.getElementById('status-' + key).textContent = text;
+  }
+
+  function setPct(key, pct) {
+    const el = document.getElementById('pct-' + key);
+    if (pct === null) { el.textContent = ''; return; }
+    el.innerHTML = '<tspan class="a">' + pct + '%</tspan><tspan class="sep"> / </tspan><tspan class="r">' + (100 - pct) + '%</tspan>';
+  }
+
+  function splitLabel(pct) {
+    return pct + '% approve / ' + (100 - pct) + '% reject';
   }
 
   function addLog(label, pct, reasoning, cls) {
     if (logEmpty) logEmpty.remove();
     const line = document.createElement('div');
     line.className = 'log-line' + (cls ? (' ' + cls) : '');
-    line.innerHTML = '&gt; <b>' + label + (pct !== null ? (' [' + pct + '%]') : '') + '</b> ' + reasoning;
+    const pctStr = pct !== null ? (' [' + splitLabel(pct) + ']') : '';
+    line.innerHTML = '&gt; <b>' + label + pctStr + '</b> — ' + reasoning;
     logEl.appendChild(line);
     logEl.scrollTop = logEl.scrollHeight;
   }
@@ -277,7 +288,8 @@
   async function askPersona(key, proposal) {
     const p = personas[key];
     setPanel(key, 'processing');
-    setCaption(key, '<b>ANALYZING</b>querying node…');
+    setStatus(key, 'analyzing…');
+    setPct(key, null);
 
     try {
       const response = await fetch('/api/proxy', {
@@ -304,12 +316,14 @@
 
       const approve = pct >= 50;
       setPanel(key, approve ? 'approve' : 'reject');
-      setCaption(key, '<b>' + (approve ? 'APPROVE' : 'REJECT') + ' ' + pct + '%</b>' + (parsed.reasoning || ''));
+      setStatus(key, approve ? 'approved' : 'rejected');
+      setPct(key, pct);
       addLog(p.label, pct, parsed.reasoning || '(no reasoning)', approve ? 'approve' : 'reject');
       return pct;
     } catch (err) {
       setPanel(key, 'reject');
-      setCaption(key, '<b>LINK ERROR</b>' + (err.message || err), true);
+      setStatus(key, 'link error');
+      setPct(key, null);
       addLog(p.label, null, 'LINK ERROR — ' + (err.message || err), 'reject');
       return null;
     }
@@ -328,7 +342,7 @@
     const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
     const approve = avg >= 50;
     verdictDiv.className = 'verdict-line ' + (approve ? 'approve' : 'reject');
-    verdictDiv.innerHTML = 'CONSENSUS: <b>' + avg + '% — ' + (approve ? 'APPROVED' : 'REJECTED') + '</b> &nbsp;(' + valid.length + '/3 reporting)';
+    verdictDiv.innerHTML = 'CONSENSUS: <b>' + splitLabel(avg) + ' — ' + (approve ? 'APPROVED' : 'REJECTED') + '</b> &nbsp;(' + valid.length + '/3 reporting)';
     logEl.appendChild(verdictDiv);
     logEl.scrollTop = logEl.scrollHeight;
     magiLabel.style.fill = approve ? '#57e0c2' : 'var(--red)';
@@ -352,7 +366,8 @@
     logEl.innerHTML = '';
     ['melchior', 'balthasar', 'casper'].forEach(k => {
       setPanel(k, '');
-      setCaption(k, '<b>STANDBY</b>');
+      setStatus(k, 'standby');
+      setPct(k, null);
     });
 
     const keys = Object.keys(personas);
