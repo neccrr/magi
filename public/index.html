@@ -31,6 +31,8 @@
     box-shadow:0 0 0 1px #000, 0 0 22px rgba(247,131,0,0.25), inset 0 0 30px rgba(247,131,0,0.04);
     padding:6px;
     background:var(--bg);
+    position:relative;
+    overflow:hidden;
   }
   .screen-inner{
     border:1px solid var(--orange-dim);
@@ -39,6 +41,18 @@
   }
   svg{display:block; width:100%; height:auto;}
   text{font-family:'Share Tech Mono',monospace;}
+
+  /* CRT scanline overlay */
+  .crt-overlay{
+    position:absolute; inset:0; pointer-events:none; z-index:60;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:multiply;
+    animation:crtflicker 6.5s infinite;
+  }
+  @keyframes crtflicker{
+    0%,100%{ opacity:.85; } 91%{ opacity:.85; } 92%{ opacity:.55; }
+    93%{ opacity:.9; } 95%{ opacity:.65; } 96%{ opacity:.85; }
+  }
 
   /* header kanji */
   .kanji{
@@ -57,13 +71,16 @@
     font-family:'Orbitron',sans-serif; font-weight:800; font-size:23px;
     fill:#07181c; letter-spacing:1px; text-anchor:middle;
   }
-  .persona-role{
-    font-family:'Share Tech Mono',monospace; font-size:11px; fill:#0d2b33; text-anchor:middle; letter-spacing:2px;
-  }
   .magi-text{
     font-family:'Noto Serif JP',serif; font-weight:900; font-style:italic; font-size:26px;
     fill:var(--orange); text-anchor:middle;
   }
+
+  .persona-group{
+    opacity:0; transform:scale(.9); transform-box:fill-box; transform-origin:50% 50%;
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .persona-group.online{ opacity:1; transform:scale(1); }
 
   .persona-group .panel{
     stroke:#000; stroke-width:7; stroke-linejoin:round;
@@ -74,13 +91,12 @@
   }
   .persona-group.processing .panel{ animation:flicker 1s ease-in-out infinite; }
   @keyframes flicker{ 0%,100%{opacity:1;} 50%{opacity:.72;} }
+  .persona-group.boot-flash .panel{ animation:bootflash .4s ease-out; }
+  @keyframes bootflash{ 0%{ filter:drop-shadow(0 0 22px #fff) brightness(2.2);} 100%{ filter:drop-shadow(0 0 6px rgba(69,182,218,0.35)) brightness(1);} }
   .persona-group.approve .panel{ fill:#57e0c2; filter:drop-shadow(0 0 10px rgba(87,224,194,0.65)); }
   .persona-group.reject .panel{ fill:url(#hazard); filter:drop-shadow(0 0 10px rgba(255,43,31,0.55)); }
   .persona-group:hover .panel{ filter:brightness(1.15) drop-shadow(0 0 12px rgba(255,255,255,0.4)); }
 
-  /* reject uses red/black hazard stripes underneath — switch text to a light,
-     outlined treatment there so it stays legible; every other state keeps
-     the dark navy text on the light cyan/mint fill. */
   .persona-group.reject .persona-name{ fill:#fff8e8; text-shadow:0 0 3px #000, 0 0 6px #000; }
   .persona-group.reject .persona-status{ fill:#ffe3c2; opacity:1; text-shadow:0 0 3px #000; }
   .persona-group.reject .persona-pct .a{ fill:#7dffc9; text-shadow:0 0 3px #000; }
@@ -88,7 +104,6 @@
   .persona-group.reject .persona-pct .sep{ fill:#fff; opacity:.8; }
 
   .strut{ stroke:var(--orange); stroke-width:3; }
-  .frame-rule{ stroke:var(--orange); stroke-width:2; fill:none; }
   .dbl-line{ stroke:var(--orange); stroke-width:2; }
 
   .persona-pct{
@@ -121,6 +136,46 @@
   .tooltip .t-status.approve{ color:#57e0c2; }
   .tooltip .t-status.reject{ color:var(--red); }
   .tooltip .t-reason{ color:#e0b064; }
+
+  /* history toggle + drawer */
+  .history-toggle{
+    position:absolute; top:10px; right:10px; z-index:35;
+    background:transparent; border:1px solid var(--orange-dim); color:var(--orange-dim);
+    font-family:'Share Tech Mono',monospace; font-size:10.5px; letter-spacing:1px;
+    padding:5px 9px; cursor:pointer;
+  }
+  .history-toggle:hover{ color:var(--orange); border-color:var(--orange); }
+  .drawer{
+    position:absolute; top:0; right:0; bottom:0; width:270px; max-width:80%;
+    background:#050301; border-left:1px solid var(--orange-dim);
+    transform:translateX(100%); transition:transform .25s ease;
+    z-index:45; display:flex; flex-direction:column;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; border-bottom:1px solid var(--orange-dim);
+    font-size:11.5px; letter-spacing:1.5px; color:var(--orange);
+  }
+  .drawer-head button{
+    background:transparent; border:none; color:var(--orange-dim); cursor:pointer;
+    font-family:'Share Tech Mono',monospace; font-size:12px;
+  }
+  .drawer-head button:hover{ color:var(--orange); }
+  .drawer-list{ flex:1; overflow-y:auto; padding:8px; scrollbar-width:thin; scrollbar-color:var(--orange-dim) transparent; }
+  .drawer-list::-webkit-scrollbar{ width:6px; }
+  .drawer-list::-webkit-scrollbar-thumb{ background:var(--orange-dim); }
+  .drawer-empty{ color:var(--orange-dim); font-size:11.5px; padding:14px 6px; }
+  .drawer-item{
+    border:1px solid var(--orange-dim); padding:8px 9px; margin-bottom:8px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .drawer-item:hover{ border-color:var(--orange); background:rgba(247,131,0,0.05); }
+  .di-date{ font-size:9.5px; color:var(--orange-dim); letter-spacing:1px; margin-bottom:4px; }
+  .di-prop{ font-size:11.5px; color:#e0b064; line-height:1.4; margin-bottom:5px; }
+  .di-verdict{ font-size:10.5px; letter-spacing:.5px; font-weight:700; }
+  .di-verdict.approve{ color:#57e0c2; }
+  .di-verdict.reject{ color:var(--red); }
 
   /* bottom bar */
   .bar-row{
@@ -162,14 +217,30 @@
   .log-line.approve b{ color:#57e0c2; }
   .log-line.reject b{ color:var(--red); }
   .log-empty{ color:var(--orange-dim); }
+  .retry-btn, .copy-btn{
+    background:transparent; border:1px solid currentColor; color:var(--red);
+    font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:1px;
+    padding:1px 7px; margin-left:8px; cursor:pointer; vertical-align:1px;
+  }
+  .retry-btn:hover, .copy-btn:hover{ background:rgba(255,255,255,0.08); }
+  .copy-btn{ color:var(--orange-dim); }
   .verdict-line{ margin-top:6px; padding-top:8px; border-top:1px dashed var(--orange-dim); font-size:13px; letter-spacing:1px; }
   .verdict-line b{ font-size:15px; }
   .verdict-line.approve b{ color:#57e0c2; text-shadow:0 0 8px rgba(87,224,194,.7); }
   .verdict-line.reject b{ color:var(--red); text-shadow:0 0 8px rgba(255,43,31,.7); }
+  .verdict-line .copy-btn{ color:var(--orange); }
 </style>
 </head>
 <body>
-<div class="screen"><div class="screen-inner">
+<div class="screen">
+
+  <button class="history-toggle" id="history-toggle" type="button">[HISTORY]</button>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head"><span>PAST DELIBERATIONS</span><button id="drawer-close" type="button">[X]</button></div>
+    <div class="drawer-list" id="drawer-list"></div>
+  </div>
+
+  <div class="screen-inner">
 
   <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -250,7 +321,9 @@
     <div class="t-reason" id="t-reason"></div>
   </div>
 
-</div></div>
+  </div>
+  <div class="crt-overlay"></div>
+</div>
 
 <script src="/modules.js" defer></script>
 </body>
