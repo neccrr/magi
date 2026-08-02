@@ -187,7 +187,7 @@ const personas = {
   });
 
   questionEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); runDeliberation(); }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runDeliberation(); }
   });
   questionEl.addEventListener('input', () => {
     runHint.className = questionEl.value.trim() ? 'run-hint ready' : 'run-hint';
