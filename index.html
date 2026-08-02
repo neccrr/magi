@@ -1,374 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MAGI SYSTEM · NARA ROUTER</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        /* ─── same styles as before, except we removed the .api-row ─── */
-        :root {
-            --bg: #0b0904;
-            --panel: #171205;
-            --amber: #ffb000;
-            --amber-dim: #8a5f00;
-            --amber-bright: #ffd166;
-            --red: #ff3b1f;
-            --green: #5cff8f;
-            --line: #4a3200;
-            --ink: #ffcf6e;
-        }
-        * { box-sizing: border-box; }
-        html, body { margin:0; padding:0; }
-        body {
-            background:
-                repeating-linear-gradient(0deg, rgba(255,176,0,0.025) 0px, rgba(255,176,0,0.025) 1px, transparent 1px, transparent 3px),
-                radial-gradient(ellipse at 50% -10%, #241a05 0%, var(--bg) 55%);
-            color: var(--ink);
-            font-family: 'Share Tech Mono', monospace;
-            min-height: 100vh;
-            padding: 28px 18px 60px;
-            overflow-x: hidden;
-        }
-        .wrap { max-width:1080px; margin:0 auto; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAGI SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Noto+Serif+JP:wght@700;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#f78300;
+    --orange-dim:#7a4200;
+    --cyan:#45b6da;
+    --cyan-dk:#1c5c72;
+    --cyan-glow:#8fe3ff;
+    --red:#ff2b1f;
+    --bg:#020100;
+    --ink:#0a1214;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:'Share Tech Mono',monospace;
+    color:var(--orange);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:18px;
+  }
+  .screen{
+    width:100%; max-width:900px;
+    border:2px solid var(--orange);
+    box-shadow:0 0 0 1px #000, 0 0 22px rgba(247,131,0,0.25), inset 0 0 30px rgba(247,131,0,0.04);
+    padding:6px;
+    background:var(--bg);
+  }
+  .screen-inner{
+    border:1px solid var(--orange-dim);
+    padding:14px 16px 0;
+    position:relative;
+  }
+  svg{display:block; width:100%; height:auto;}
+  text{font-family:'Share Tech Mono',monospace;}
 
-        /* header, console, triad, verdict, footer – unchanged, but we remove .api-row */
-        .header { display:flex; align-items:center; gap:18px; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:22px; flex-wrap:wrap; }
-        .sigil { width:52px; height:52px; flex:none; }
-        .title-block h1 { font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:4px; font-size:28px; margin:0; color:var(--amber-bright); text-shadow:0 0 12px rgba(255,176,0,0.55); }
-        .title-block .sub { font-size:12px; letter-spacing:3px; color:var(--amber-dim); margin-top:4px; }
-        .clock { margin-left:auto; text-align:right; font-size:11px; color:var(--amber-dim); letter-spacing:1px; line-height:1.6; }
-        .clock b { color:var(--amber); }
+  /* header kanji */
+  .kanji{
+    font-family:'Noto Sans JP','Noto Serif JP',sans-serif;
+    font-weight:700;
+    fill:var(--orange);
+  }
+  .kanji-glow{ filter:drop-shadow(0 0 4px rgba(247,131,0,0.6)); }
 
-        .console {
-            border:1px solid var(--line);
-            background:linear-gradient(180deg, rgba(255,176,0,0.04), transparent);
-            padding:16px;
-            margin-bottom:26px;
-            position:relative;
-        }
-        .console:before {
-            content:"INPUT // PROPOSAL FOR DELIBERATION";
-            position:absolute; top:-9px; left:14px; background:var(--bg); padding:0 8px;
-            font-size:10px; letter-spacing:3px; color:var(--amber-dim);
-        }
-        textarea {
-            width:100%; min-height:64px; resize:vertical; background:transparent; border:none; outline:none;
-            color:var(--ink); font-family:'Share Tech Mono',monospace; font-size:15px; line-height:1.5; padding-top:6px;
-        }
-        textarea::placeholder { color:#6b5220; }
-        .console-foot {
-            display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:12px; flex-wrap:wrap;
-        }
-        .hint { font-size:11px; color:var(--amber-dim); letter-spacing:1px; }
+  .readout-text{ font-family:'Share Tech Mono',monospace; font-size:12.5px; fill:var(--orange); }
+  .readout-text tspan{ fill:var(--orange); }
 
-        button#run {
-            background:var(--amber); color:#150f00; border:none; font-family:'Orbitron',sans-serif; font-weight:700;
-            letter-spacing:2px; font-size:13px; padding:11px 22px; cursor:pointer;
-            clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px);
-            transition:transform .12s, box-shadow .12s; flex-shrink:0;
-        }
-        button#run:hover:not(:disabled){ box-shadow:0 0 18px rgba(255,176,0,0.6); transform:translateY(-1px); }
-        button#run:disabled{ background:#3a2c0c; color:#8a6d2e; cursor:default; }
+  .info-box-txt{ font-family:'Noto Sans JP',sans-serif; font-weight:700; fill:var(--cyan-glow); font-size:20px; }
 
-        /* triad, node, etc. – same as before */
-        .triad { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px; }
-        @media (max-width:760px){ .triad{ grid-template-columns:1fr; } }
-        .node {
-            position:relative; border:1px solid var(--line); background:var(--panel);
-            padding:18px 16px 16px; min-height:210px; display:flex; flex-direction:column;
-            transition:border-color .3s, box-shadow .3s;
-        }
-        .node.processing { border-color:var(--amber-dim); animation:scan 1.4s linear infinite; }
-        .node.approve { border-color:var(--green); box-shadow:0 0 16px rgba(92,255,143,0.12); }
-        .node.conditional { border-color:var(--amber); box-shadow:0 0 16px rgba(255,176,0,0.15); }
-        .node.reject { border-color:var(--red); box-shadow:0 0 16px rgba(255,59,31,0.15); }
-        @keyframes scan {
-            0%{ box-shadow:inset 0 -100% 0 0 rgba(255,176,0,0.08); }
-            50%{ box-shadow:inset 0 0 0 0 rgba(255,176,0,0.08); }
-            100%{ box-shadow:inset 0 -100% 0 0 rgba(255,176,0,0.08); }
-        }
-        .node-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
-        .node-name { font-family:'Orbitron',sans-serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--amber-bright); }
-        .node-num { font-size:11px; color:var(--amber-dim); }
-        .node-role { font-size:10.5px; letter-spacing:2px; color:var(--amber-dim); margin-bottom:12px; text-transform:uppercase; }
-        .node-status { font-size:11px; letter-spacing:1px; color:var(--amber-dim); margin-bottom:10px; }
-        .node-status.processing { color:var(--amber); }
-        .node-status.approve { color:var(--green); }
-        .node-status.conditional { color:var(--amber); }
-        .node-status.reject { color:var(--red); }
-        .pct-bar { width:100%; height:6px; background:rgba(255,59,31,0.35); margin-bottom:4px; overflow:hidden; }
-        .pct-bar-fill { height:100%; background:var(--green); transition:width .6s ease; }
-        .pct-label { display:flex; justify-content:space-between; font-size:11px; letter-spacing:1px; margin-bottom:10px; }
-        .pct-label .a { color:var(--green); }
-        .pct-label .r { color:var(--red); }
-        .node-reason { font-size:12.5px; line-height:1.55; color:#e0c07a; flex:1; }
-        .dots:after { content:''; display:inline-block; width:1em; animation:dots 1.2s steps(4,end) infinite; }
-        @keyframes dots { 0%{content:'';} 25%{content:'.';} 50%{content:'..';} 75%{content:'...';} }
+  .persona-name{
+    font-family:'Orbitron',sans-serif; font-weight:800; font-size:23px;
+    fill:#07181c; letter-spacing:1px; text-anchor:middle;
+  }
+  .persona-role{
+    font-family:'Share Tech Mono',monospace; font-size:11px; fill:#0d2b33; text-anchor:middle; letter-spacing:2px;
+  }
+  .magi-text{
+    font-family:'Noto Serif JP',serif; font-weight:900; font-style:italic; font-size:26px;
+    fill:var(--orange); text-anchor:middle;
+  }
 
-        .verdict-panel {
-            border:1px solid var(--line); background:var(--panel); padding:20px; text-align:center; position:relative;
-            min-height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-        }
-        .verdict-panel:before {
-            content:"MAGI CONSENSUS"; position:absolute; top:-9px; left:14px; background:var(--bg); padding:0 8px;
-            font-size:10px; letter-spacing:3px; color:var(--amber-dim);
-        }
-        .tally { font-size:12px; letter-spacing:2px; color:var(--amber-dim); }
-        .tally b { color:var(--amber); }
-        .final { font-family:'Orbitron',sans-serif; font-weight:900; font-size:26px; letter-spacing:5px; }
-        .final.approve { color:var(--green); text-shadow:0 0 18px rgba(92,255,143,0.6); }
-        .final.conditional { color:var(--amber); text-shadow:0 0 18px rgba(255,176,0,0.6); }
-        .final.reject { color:var(--red); text-shadow:0 0 18px rgba(255,59,31,0.6); }
-        .final.idle { color:var(--amber-dim); font-size:15px; letter-spacing:3px; }
+  .panel{
+    stroke:#000; stroke-width:7; stroke-linejoin:round;
+    fill:var(--cyan);
+    filter:drop-shadow(0 0 6px rgba(69,182,218,0.35));
+    transition:fill .35s;
+  }
+  .panel.processing{ fill:var(--cyan); animation:flicker 1s ease-in-out infinite; }
+  @keyframes flicker{ 0%,100%{opacity:1;} 50%{opacity:.72;} }
+  .panel.approve{ fill:#57e0c2; filter:drop-shadow(0 0 10px rgba(87,224,194,0.65)); }
+  .panel.reject{ fill:url(#hazard); }
 
-        .footer-note { margin-top:18px; font-size:10.5px; color:#5a4419; letter-spacing:1px; line-height:1.6; text-align:center; }
-        .model-badge { display:inline-block; font-size:9px; letter-spacing:1px; color:var(--amber-dim); border:1px solid var(--line); padding:2px 10px; border-radius:0; margin-left:8px; background:rgba(255,176,0,0.04); font-family:'Share Tech Mono',monospace; }
-    </style>
+  .strut{ stroke:var(--orange); stroke-width:3; }
+  .frame-rule{ stroke:var(--orange); stroke-width:2; fill:none; }
+  .dbl-line{ stroke:var(--orange); stroke-width:2; }
+
+  .caption-fo{ overflow:visible; }
+  .caption{
+    font-family:'Share Tech Mono',monospace; font-size:10.5px; line-height:1.35;
+    color:#07181c; text-align:center; padding:0 10px;
+  }
+  .caption b{ display:block; font-size:12px; margin-bottom:2px; }
+  .caption.err{ color:#3a0300; }
+
+  .info-box{ fill:#020806; stroke:var(--cyan-glow); stroke-width:2; }
+  .info-box.pulse{ animation:ipulse 0.9s ease-in-out infinite; }
+  @keyframes ipulse{ 0%,100%{ stroke:var(--cyan-glow);} 50%{ stroke:#ffffff;} }
+
+  /* bottom bars, outside svg */
+  .bar-row{
+    display:flex; align-items:center; gap:10px;
+    border-top:1px solid var(--orange-dim);
+    padding:9px 2px;
+    font-size:13px;
+  }
+  .bar-label{ color:var(--orange); white-space:nowrap; letter-spacing:1px; }
+  .bar-fill{
+    flex:1; border:1px solid var(--orange-dim); height:20px; position:relative;
+    display:flex; align-items:center; padding:0 8px; overflow:hidden;
+  }
+  .dotted{ color:var(--orange-dim); letter-spacing:2px; font-size:13px; user-select:none; white-space:nowrap; overflow:hidden; }
+  #question{
+    width:100%; background:transparent; border:none; outline:none;
+    color:var(--orange); font-family:'Share Tech Mono',monospace; font-size:14px;
+    caret-color:var(--orange);
+  }
+  #question::placeholder{ color:var(--orange-dim); }
+  .run-hint{
+    font-size:10.5px; color:var(--orange-dim); letter-spacing:1px; white-space:nowrap;
+  }
+  .run-hint.ready{ color:var(--orange); animation:blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0.25; } }
+
+  /* console log */
+  .log{
+    border:1px solid var(--orange-dim); margin:10px 0 14px; padding:10px 12px;
+    font-size:12px; line-height:1.7; min-height:78px; max-height:180px; overflow-y:auto;
+  }
+  .log-line{ color:#e0b064; }
+  .log-line b{ color:var(--orange); }
+  .log-line.approve b{ color:#57e0c2; }
+  .log-line.reject b{ color:var(--red); }
+  .log-empty{ color:var(--orange-dim); }
+  .verdict-line{ margin-top:6px; padding-top:8px; border-top:1px dashed var(--orange-dim); font-size:13px; letter-spacing:1px; }
+  .verdict-line b{ font-size:15px; }
+  .verdict-line.approve b{ color:#57e0c2; text-shadow:0 0 8px rgba(87,224,194,.7); }
+  .verdict-line.reject b{ color:var(--red); text-shadow:0 0 8px rgba(255,43,31,.7); }
+</style>
 </head>
 <body>
-<div class="wrap">
+<div class="screen"><div class="screen-inner">
 
-    <div class="header">
-        <svg class="sigil" viewBox="0 0 100 100">
-            <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="none" stroke="#ffb000" stroke-width="2"/>
-            <polygon points="50,20 79,35 79,65 50,80 21,65 21,35" fill="none" stroke="#ffb000" stroke-width="1" opacity="0.5"/>
-            <circle cx="50" cy="50" r="6" fill="#ffb000"/>
-        </svg>
-        <div class="title-block">
-            <h1>MAGI SYSTEM <span class="model-badge">via NARA ROUTER</span></h1>
-            <div class="sub">TRIUNE DECISION ARRAY &nbsp;/&nbsp; MELCHIOR &middot; BALTHASAR &middot; CASPER</div>
-        </div>
-        <div class="clock" id="clock">STATUS: <b>STANDBY</b></div>
+  <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="hazard" width="26" height="26" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+        <rect width="26" height="26" fill="#1a0000"/>
+        <rect width="13" height="26" fill="#ff2b1f"/>
+      </pattern>
+    </defs>
+
+    <!-- header kanji -->
+    <text x="34" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">質問</text>
+    <line x1="34" y1="108" x2="268" y2="108" class="dbl-line"/>
+    <line x1="34" y1="115" x2="268" y2="115" class="dbl-line"/>
+
+    <text x="530" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">解決</text>
+    <line x1="530" y1="108" x2="765" y2="108" class="dbl-line"/>
+    <line x1="530" y1="115" x2="765" y2="115" class="dbl-line"/>
+
+    <!-- left readout block -->
+    <text x="34" y="138" class="readout-text"><tspan id="ro-code">CODE:473</tspan></text>
+    <text x="34" y="153" class="readout-text" font-size="11"><tspan id="ro-file">FILE:MAGI_SYS</tspan></text>
+    <text x="34" y="167" class="readout-text" font-size="11"><tspan id="ro-ext">EXTENTION:3023</tspan></text>
+    <text x="34" y="181" class="readout-text" font-size="11"><tspan id="ro-mode">EX_MODE:OFF</tspan></text>
+    <text x="34" y="195" class="readout-text" font-size="11"><tspan id="ro-pri">PRIORITY:AAA</tspan></text>
+
+    <!-- info box -->
+    <rect id="infobox" x="686" y="138" width="80" height="46" class="info-box"/>
+    <text x="726" y="168" class="info-box-txt" text-anchor="middle">情報</text>
+
+    <!-- struts -->
+    <line x1="272" y1="216" x2="292" y2="205" class="strut"/>
+    <line x1="528" y1="216" x2="508" y2="205" class="strut"/>
+    <line x1="392" y1="248" x2="392" y2="300" class="strut"/>
+    <line x1="408" y1="248" x2="408" y2="300" class="strut"/>
+
+    <!-- BALTHASAR (top) -->
+    <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209"/>
+    <text x="400" y="140" class="persona-name">BALTHASAR&#8226;2</text>
+    <foreignObject class="caption-fo" x="330" y="150" width="140" height="55">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-balthasar">the mother</div>
+    </foreignObject>
+
+    <!-- CASPER (bottom left) -->
+    <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386"/>
+    <text x="150" y="305" class="persona-name">CASPER&#8226;3</text>
+    <foreignObject class="caption-fo" x="55" y="315" width="220" height="65">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-casper">the woman</div>
+    </foreignObject>
+
+    <!-- MELCHIOR (bottom right) -->
+    <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316"/>
+    <text x="650" y="305" class="persona-name">MELCHIOR&#8226;1</text>
+    <foreignObject class="caption-fo" x="530" y="315" width="220" height="65">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="caption" id="cap-melchior">the scientist</div>
+    </foreignObject>
+
+    <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
+  </svg>
+
+  <div class="log" id="log">
+    <div class="log-empty" id="log-empty">&gt; awaiting proposal_</div>
+  </div>
+
+  <div class="bar-row">
+    <span class="bar-label">access&nbsp;code:</span>
+    <div class="bar-fill"><span class="dotted" id="access-code">••••••••••••••••••••••••••••••••••••••••••••••••</span></div>
+  </div>
+  <div class="bar-row">
+    <span class="bar-label">input:</span>
+    <div class="bar-fill">
+      <input id="question" type="text" placeholder="enter a proposal, decision, or question to deliberate on…" autocomplete="off">
     </div>
+    <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
+  </div>
 
-    <div class="console">
-        <textarea id="proposal" placeholder="Enter a proposal, decision, or question for the three personalities to deliberate on…"></textarea>
-        <div class="console-foot">
-            <div class="hint">FINAL VERDICT = AVERAGE APPROVAL ACROSS ALL THREE NODES</div>
-            <button id="run">BEGIN DELIBERATION</button>
-        </div>
-    </div>
-
-    <div class="triad">
-        <div class="node" id="node-melchior">
-            <div class="node-head"><span class="node-name">MELCHIOR</span><span class="node-num">01</span></div>
-            <div class="node-role">the scientist</div>
-            <div class="node-status" id="status-melchior">STANDBY</div>
-            <div id="body-melchior"></div>
-        </div>
-        <div class="node" id="node-balthasar">
-            <div class="node-head"><span class="node-name">BALTHASAR</span><span class="node-num">02</span></div>
-            <div class="node-role">the mother</div>
-            <div class="node-status" id="status-balthasar">STANDBY</div>
-            <div id="body-balthasar"></div>
-        </div>
-        <div class="node" id="node-casper">
-            <div class="node-head"><span class="node-name">CASPER</span><span class="node-num">03</span></div>
-            <div class="node-role">the woman</div>
-            <div class="node-status" id="status-casper">STANDBY</div>
-            <div id="body-casper"></div>
-        </div>
-    </div>
-
-    <div class="verdict-panel">
-        <div class="tally" id="tally">AWAITING INPUT</div>
-        <div class="final idle" id="final">NO ACTIVE PROPOSAL</div>
-    </div>
-
-    <div class="footer-note">EACH PERSONALITY REASONS INDEPENDENTLY FROM ITS OWN ARCHETYPE. NO PERSONALITY SEES THE OTHERS' DELIBERATIONS.</div>
-</div>
+</div></div>
 
 <script>
-    // ─── CONFIG ────────────────────────────────────────────────────────────
-    const DEFAULT_MODEL = 'agnes-2.0-flash';
+  const DEFAULT_MODEL = 'agnes-2.0-flash';
 
-    // ─── PERSONAS ──────────────────────────────────────────────────────────
-    const personas = {
-        melchior: {
-            label: 'MELCHIOR-1',
-            system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
-        },
-        balthasar: {
-            label: 'BALTHASAR-2',
-            system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
-        },
-        casper: {
-            label: 'CASPER-3',
-            system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
-        }
-    };
-
-    // ─── DOM REFS ──────────────────────────────────────────────────────────
-    const proposalEl = document.getElementById('proposal');
-    const runBtn = document.getElementById('run');
-    const clockEl = document.getElementById('clock');
-    const tallyEl = document.getElementById('tally');
-    const finalEl = document.getElementById('final');
-
-    function setClock(text) {
-        clockEl.innerHTML = 'STATUS: <b>' + text + '</b>';
+  const personas = {
+    melchior: {
+      label: 'MELCHIOR-1',
+      system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
+    },
+    balthasar: {
+      label: 'BALTHASAR-2',
+      system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
+    },
+    casper: {
+      label: 'CASPER-3',
+      system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
     }
+  };
 
-    function setStatus(key, cls, text) {
-        const el = document.getElementById('status-' + key);
-        el.className = 'node-status ' + cls;
-        el.textContent = text;
+  const questionEl = document.getElementById('question');
+  const runHint = document.getElementById('run-hint');
+  const logEl = document.getElementById('log');
+  const logEmpty = document.getElementById('log-empty');
+  const infobox = document.getElementById('infobox');
+  const magiLabel = document.getElementById('magi-label');
+  const roMode = document.getElementById('ro-mode');
+  const roPri = document.getElementById('ro-pri');
+  const accessCode = document.getElementById('access-code');
+
+  let running = false;
+
+  function extractJSON(text) {
+    let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    try { JSON.parse(cleaned); return cleaned; } catch (_) {
+      const a = cleaned.indexOf('{'), b = cleaned.lastIndexOf('}');
+      if (a !== -1 && b !== -1 && b > a) {
+        const candidate = cleaned.substring(a, b + 1);
+        JSON.parse(candidate);
+        return candidate;
+      }
+      throw new Error('No JSON object found: ' + text.substring(0, 200));
     }
+  }
 
-    function renderResult(key, pct, reasoning) {
-        const node = document.getElementById('node-' + key);
-        const cls = pct >= 50 ? 'approve' : 'reject';
-        node.className = 'node ' + cls;
-        setStatus(key, cls, 'VERDICT LOCKED');
-        document.getElementById('body-' + key).innerHTML =
-            '<div class="pct-bar"><div class="pct-bar-fill" style="width:' + pct + '%"></div></div>' +
-            '<div class="pct-label"><span class="a">' + pct + '% APPROVE</span><span class="r">' + (100 - pct) +
-            '% REJECT</span></div>' +
-            '<div class="node-reason">' + reasoning + '</div>';
+  function setPanel(key, state) {
+    document.getElementById('panel-' + key).setAttribute('class', 'panel ' + state);
+  }
+
+  function setCaption(key, html, err) {
+    const el = document.getElementById('cap-' + key);
+    el.className = 'caption' + (err ? ' err' : '');
+    el.innerHTML = html;
+  }
+
+  function addLog(label, pct, reasoning, cls) {
+    if (logEmpty) logEmpty.remove();
+    const line = document.createElement('div');
+    line.className = 'log-line' + (cls ? (' ' + cls) : '');
+    line.innerHTML = '&gt; <b>' + label + (pct !== null ? (' [' + pct + '%]') : '') + '</b> ' + reasoning;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  async function askPersona(key, proposal) {
+    const p = personas[key];
+    setPanel(key, 'processing');
+    setCaption(key, '<b>ANALYZING</b>querying node…');
+
+    try {
+      const response = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: DEFAULT_MODEL,
+          messages: [
+            { role: 'system', content: p.system },
+            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
+          ]
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || data.error || ('HTTP ' + response.status));
+
+      const raw = data.choices?.[0]?.message?.content || '';
+      if (!raw) throw new Error('empty response');
+      const parsed = JSON.parse(extractJSON(raw));
+
+      let pct = Math.round(Number(parsed.approve_pct));
+      if (isNaN(pct)) pct = 50;
+      pct = Math.max(0, Math.min(100, pct));
+
+      const approve = pct >= 50;
+      setPanel(key, approve ? 'approve' : 'reject');
+      setCaption(key, '<b>' + (approve ? 'APPROVE' : 'REJECT') + ' ' + pct + '%</b>' + (parsed.reasoning || ''));
+      addLog(p.label, pct, parsed.reasoning || '(no reasoning)', approve ? 'approve' : 'reject');
+      return pct;
+    } catch (err) {
+      setPanel(key, 'reject');
+      setCaption(key, '<b>LINK ERROR</b>' + (err.message || err), true);
+      addLog(p.label, null, 'LINK ERROR — ' + (err.message || err), 'reject');
+      return null;
     }
+  }
 
-    // ─── ROBUST JSON EXTRACTION ───────────────────────────────────────────
-    function extractJSON(text) {
-        let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-        try {
-            JSON.parse(cleaned);
-            return cleaned;
-        } catch (_) {
-            const firstBrace = cleaned.indexOf('{');
-            const lastBrace = cleaned.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-                const candidate = cleaned.substring(firstBrace, lastBrace + 1);
-                try {
-                    JSON.parse(candidate);
-                    return candidate;
-                } catch (__) {
-                    throw new Error('Could not extract valid JSON: ' + text.substring(0, 200));
-                }
-            } else {
-                throw new Error('No JSON object found: ' + text.substring(0, 200));
-            }
-        }
+  function finalize(votes) {
+    const valid = votes.filter(v => v !== null);
+    const verdictDiv = document.createElement('div');
+    if (!valid.length) {
+      verdictDiv.className = 'verdict-line reject';
+      verdictDiv.innerHTML = 'CONSENSUS: <b>FAILED — ALL NODES UNREACHABLE</b>';
+      logEl.appendChild(verdictDiv);
+      magiLabel.style.fill = 'var(--red)';
+      return;
     }
+    const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
+    const approve = avg >= 50;
+    verdictDiv.className = 'verdict-line ' + (approve ? 'approve' : 'reject');
+    verdictDiv.innerHTML = 'CONSENSUS: <b>' + avg + '% — ' + (approve ? 'APPROVED' : 'REJECTED') + '</b> &nbsp;(' + valid.length + '/3 reporting)';
+    logEl.appendChild(verdictDiv);
+    logEl.scrollTop = logEl.scrollHeight;
+    magiLabel.style.fill = approve ? '#57e0c2' : 'var(--red)';
+    magiLabel.style.filter = 'drop-shadow(0 0 8px ' + (approve ? 'rgba(87,224,194,.8)' : 'rgba(255,43,31,.8)') + ')';
+  }
 
-    // ─── CALL PROXY (no API key sent from client) ─────────────────────────
-    async function askPersona(key, proposal) {
-        const p = personas[key];
+  async function runDeliberation() {
+    const proposal = questionEl.value.trim();
+    if (!proposal || running) { questionEl.focus(); return; }
+    running = true;
+    questionEl.disabled = true;
+    runHint.textContent = '[DELIBERATING…]';
+    runHint.className = 'run-hint';
+    infobox.classList.add('pulse');
+    roMode.textContent = 'EX_MODE:ON';
+    roPri.textContent = 'PRIORITY:AAA*';
+    accessCode.textContent = 'COMPUTING' + '.'.repeat(30);
+    magiLabel.style.fill = '';
+    magiLabel.style.filter = '';
 
-        const node = document.getElementById('node-' + key);
-        node.className = 'node processing';
-        setStatus(key, 'processing', 'ANALYZING');
-        document.getElementById('body-' + key).innerHTML =
-            '<div class="node-reason" style="color:var(--amber-dim)">querying Nara Router<span class="dots"></span></div>';
-
-        try {
-            const response = await fetch('/api/proxy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: DEFAULT_MODEL,
-                    messages: [
-                        { role: 'system', content: p.system },
-                        { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-                    ]
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                const errMsg = data.error?.message || data.error || 'HTTP ' + response.status;
-                throw new Error('Proxy error: ' + errMsg);
-            }
-
-            const raw = data.choices?.[0]?.message?.content || '';
-            if (!raw) throw new Error('Empty response from Nara Router');
-
-            const jsonStr = extractJSON(raw);
-            const parsed = JSON.parse(jsonStr);
-
-            let pct = Math.round(Number(parsed.approve_pct));
-            if (isNaN(pct)) pct = 50;
-            pct = Math.max(0, Math.min(100, pct));
-
-            renderResult(key, pct, parsed.reasoning || '(no reasoning returned)');
-            return pct;
-
-        } catch (err) {
-            setStatus(key, 'reject', 'LINK ERROR');
-            document.getElementById('body-' + key).innerHTML =
-                '<div class="node-reason" style="color:var(--red)">' + (err.message || err) + '</div>';
-            return null;
-        }
-    }
-
-    // ─── FINALIZE ──────────────────────────────────────────────────────────
-    function finalize(votes) {
-        const valid = votes.filter(v => v !== null);
-        if (!valid.length) {
-            tallyEl.textContent = 'ALL NODES UNREACHABLE';
-            finalEl.className = 'final reject';
-            finalEl.textContent = 'CONSENSUS FAILED';
-            setClock('LINK ERROR');
-            return;
-        }
-        const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
-        tallyEl.innerHTML =
-            '<b>' + avg + '% APPROVE</b> &mdash; ' + (100 - avg) + '% REJECT &nbsp;(' + valid.length +
-            '/3 nodes reporting)';
-
-        let outcome, cls;
-        if (avg >= 50) {
-            outcome = 'PROPOSAL APPROVED';
-            cls = 'approve';
-        } else {
-            outcome = 'PROPOSAL REJECTED';
-            cls = 'reject';
-        }
-        finalEl.className = 'final ' + cls;
-        finalEl.textContent = outcome;
-        setClock('CONSENSUS REACHED');
-    }
-
-    // ─── MAIN ACTION ──────────────────────────────────────────────────────
-    async function runDeliberation() {
-        const proposal = proposalEl.value.trim();
-        if (!proposal) {
-            proposalEl.focus();
-            return;
-        }
-
-        runBtn.disabled = true;
-        runBtn.textContent = 'DELIBERATING…';
-        setClock('DELIBERATION IN PROGRESS');
-        tallyEl.textContent = 'COMPUTING…';
-        finalEl.className = 'final idle';
-        finalEl.textContent = 'AWAITING CONSENSUS';
-
-        // Reset nodes
-        ['melchior', 'balthasar', 'casper'].forEach(k => {
-            document.getElementById('node-' + k).className = 'node';
-            setStatus(k, '', 'STANDBY');
-            document.getElementById('body-' + k).innerHTML = '';
-        });
-
-        const keys = Object.keys(personas);
-        const votes = await Promise.all(keys.map(k => askPersona(k, proposal)));
-        finalize(votes);
-
-        runBtn.disabled = false;
-        runBtn.textContent = 'BEGIN DELIBERATION';
-    }
-
-    // ─── EVENT BINDING ────────────────────────────────────────────────────
-    runBtn.addEventListener('click', runDeliberation);
-
-    proposalEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-            e.preventDefault();
-            runBtn.click();
-        }
+    logEl.innerHTML = '';
+    ['melchior', 'balthasar', 'casper'].forEach(k => {
+      setPanel(k, '');
+      setCaption(k, '<b>STANDBY</b>');
     });
+
+    const keys = Object.keys(personas);
+    const votes = await Promise.all(keys.map(k => askPersona(k, proposal)));
+    finalize(votes);
+
+    infobox.classList.remove('pulse');
+    roMode.textContent = 'EX_MODE:OFF';
+    roPri.textContent = 'PRIORITY:AAA';
+    accessCode.textContent = '•'.repeat(50);
+    runHint.textContent = '[ENTER TO RUN]';
+    runHint.className = 'run-hint ready';
+    questionEl.disabled = false;
+    running = false;
+  }
+
+  questionEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); runDeliberation(); }
+  });
+  questionEl.addEventListener('input', () => {
+    runHint.className = questionEl.value.trim() ? 'run-hint ready' : 'run-hint';
+  });
 </script>
 </body>
 </html>
