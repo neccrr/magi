@@ -1,524 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MAGI SYSTEM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Noto+Serif+JP:wght@700;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        --orange: #f78300;
-        --orange-dim: #7a4200;
-        --cyan: #45b6da;
-        --cyan-dk: #1c5c72;
-        --cyan-glow: #8fe3ff;
-        --red: #ff2b1f;
-        --bg: #020100;
-        --ink: #0a1214;
-      }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAGI SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Noto+Serif+JP:wght@700;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#f78300;
+    --orange-dim:#7a4200;
+    --cyan:#45b6da;
+    --cyan-dk:#1c5c72;
+    --cyan-glow:#8fe3ff;
+    --red:#ff2b1f;
+    --bg:#020100;
+    --ink:#0a1214;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:'Share Tech Mono',monospace;
+    color:var(--orange);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:10px;
+  }
+  .screen{
+    width:100%; max-width:1180px;
+    border:2px solid var(--orange);
+    box-shadow:0 0 0 1px #000, 0 0 22px rgba(247,131,0,0.25), inset 0 0 30px rgba(247,131,0,0.04);
+    padding:6px;
+    background:var(--bg);
+  }
+  .screen-inner{
+    border:1px solid var(--orange-dim);
+    padding:14px 16px 0;
+    position:relative;
+  }
+  svg{display:block; width:100%; height:auto;}
+  text{font-family:'Share Tech Mono',monospace;}
 
-      * {
-        box-sizing: border-box;
-      }
+  /* header kanji */
+  .kanji{
+    font-family:'Noto Sans JP','Noto Serif JP',sans-serif;
+    font-weight:700;
+    fill:var(--orange);
+  }
+  .kanji-glow{ filter:drop-shadow(0 0 4px rgba(247,131,0,0.6)); }
 
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: var(--bg);
-      }
+  .readout-text{ font-family:'Share Tech Mono',monospace; font-size:12.5px; fill:var(--orange); }
+  .readout-text tspan{ fill:var(--orange); }
 
-      body {
-        font-family: 'Share Tech Mono', monospace;
-        color: var(--orange);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-      }
+  .info-box-txt{ font-family:'Noto Sans JP',sans-serif; font-weight:700; fill:var(--cyan-glow); font-size:20px; }
 
-      .screen {
-        width: 100%;
-        max-width: 1180px;
-        border: 2px solid var(--orange);
-        box-shadow: 0 0 0 1px #000, 0 0 22px rgba(247, 131, 0, 0.25), inset 0 0 30px rgba(247, 131, 0, 0.04);
-        padding: 6px;
-        background: var(--bg);
-      }
+  .persona-name{
+    font-family:'Orbitron',sans-serif; font-weight:800; font-size:23px;
+    fill:#07181c; letter-spacing:1px; text-anchor:middle;
+  }
+  .persona-role{
+    font-family:'Share Tech Mono',monospace; font-size:11px; fill:#0d2b33; text-anchor:middle; letter-spacing:2px;
+  }
+  .magi-text{
+    font-family:'Noto Serif JP',serif; font-weight:900; font-style:italic; font-size:26px;
+    fill:var(--orange); text-anchor:middle;
+  }
 
-      .screen-inner {
-        border: 1px solid var(--orange-dim);
-        padding: 14px 16px 0;
-        position: relative;
-      }
+  .persona-group .panel{
+    stroke:#000; stroke-width:7; stroke-linejoin:round;
+    fill:var(--cyan);
+    filter:drop-shadow(0 0 6px rgba(69,182,218,0.35));
+    transition:fill .35s;
+    cursor:pointer;
+  }
+  .persona-group.processing .panel{ animation:flicker 1s ease-in-out infinite; }
+  @keyframes flicker{ 0%,100%{opacity:1;} 50%{opacity:.72;} }
+  .persona-group.approve .panel{ fill:#57e0c2; filter:drop-shadow(0 0 10px rgba(87,224,194,0.65)); }
+  .persona-group.reject .panel{ fill:url(#hazard); filter:drop-shadow(0 0 10px rgba(255,43,31,0.55)); }
+  .persona-group:hover .panel{ filter:brightness(1.15) drop-shadow(0 0 12px rgba(255,255,255,0.4)); }
 
-      svg {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      text {
-        font-family: 'Share Tech Mono', monospace;
-      }
-
-      /* header kanji */
-      .kanji {
-        font-family: 'Noto Sans JP', 'Noto Serif JP', sans-serif;
-        font-weight: 700;
-        fill: var(--orange);
-      }
-
-      .kanji-glow {
-        filter: drop-shadow(0 0 4px rgba(247, 131, 0, 0.6));
-      }
-
-      .readout-text {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12.5px;
-        fill: var(--orange);
-      }
-
-      .readout-text tspan {
-        fill: var(--orange);
-      }
-
-      .info-box-txt {
-        font-family: 'Noto Sans JP', sans-serif;
-        font-weight: 700;
-        fill: var(--cyan-glow);
-        font-size: 20px;
-      }
-
-      .persona-name {
-        font-family: 'Orbitron', sans-serif;
-        font-weight: 800;
-        font-size: 23px;
-        fill: #07181c;
-        letter-spacing: 1px;
-        text-anchor: middle;
-      }
-
-      .persona-role {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        fill: #0d2b33;
-        text-anchor: middle;
-        letter-spacing: 2px;
-      }
-
-      .magi-text {
-        font-family: 'Noto Serif JP', serif;
-        font-weight: 900;
-        font-style: italic;
-        font-size: 26px;
-        fill: var(--orange);
-        text-anchor: middle;
-      }
-
-      .persona-group .panel {
-        stroke: #000;
-        stroke-width: 7;
-        stroke-linejoin: round;
-        fill: var(--cyan);
-        filter: drop-shadow(0 0 6px rgba(69, 182, 218, 0.35));
-        transition: fill .35s;
-        cursor: pointer;
-      }
-
-      .persona-group.processing .panel {
-        animation: flicker 1s ease-in-out infinite;
-      }
-
-      @keyframes flicker {
-
-        0%,
-        100% {
-          opacity: 1;
-        }
-
-        50% {
-          opacity: .72;
-        }
-      }
-
-      .persona-group.approve .panel {
-        fill: #57e0c2;
-        filter: drop-shadow(0 0 10px rgba(87, 224, 194, 0.65));
-      }
-
-      .persona-group.reject .panel {
-        fill: url(#hazard);
-        filter: drop-shadow(0 0 10px rgba(255, 43, 31, 0.55));
-      }
-
-      .persona-group:hover .panel {
-        filter: brightness(1.15) drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
-      }
-
-      /* reject uses red/black hazard stripes underneath — switch text to a light,
+  /* reject uses red/black hazard stripes underneath — switch text to a light,
      outlined treatment there so it stays legible; every other state keeps
      the dark navy text on the light cyan/mint fill. */
-      .persona-group.reject .persona-name {
-        fill: #fff8e8;
-        text-shadow: 0 0 3px #000, 0 0 6px #000;
-      }
+  .persona-group.reject .persona-name{ fill:#fff8e8; text-shadow:0 0 3px #000, 0 0 6px #000; }
+  .persona-group.reject .persona-status{ fill:#ffe3c2; opacity:1; text-shadow:0 0 3px #000; }
+  .persona-group.reject .persona-pct .a{ fill:#7dffc9; text-shadow:0 0 3px #000; }
+  .persona-group.reject .persona-pct .r{ fill:#fff; text-shadow:0 0 3px #000; }
+  .persona-group.reject .persona-pct .sep{ fill:#fff; opacity:.8; }
 
-      .persona-group.reject .persona-status {
-        fill: #ffe3c2;
-        opacity: 1;
-        text-shadow: 0 0 3px #000;
-      }
+  .strut{ stroke:var(--orange); stroke-width:3; }
+  .frame-rule{ stroke:var(--orange); stroke-width:2; fill:none; }
+  .dbl-line{ stroke:var(--orange); stroke-width:2; }
 
-      .persona-group.reject .persona-pct .a {
-        fill: #7dffc9;
-        text-shadow: 0 0 3px #000;
-      }
+  .persona-pct{
+    font-family:'Share Tech Mono',monospace; font-weight:700; font-size:15px;
+    text-anchor:middle; letter-spacing:0.5px;
+  }
+  .persona-pct .a{ fill:#0a3b2e; }
+  .persona-pct .r{ fill:#3a0300; }
+  .persona-pct .sep{ fill:#07181c; opacity:.5; }
+  .persona-status{
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px;
+    text-anchor:middle; fill:#07181c; opacity:.75;
+  }
 
-      .persona-group.reject .persona-pct .r {
-        fill: #fff;
-        text-shadow: 0 0 3px #000;
-      }
+  .info-box{ fill:#020806; stroke:var(--cyan-glow); stroke-width:2; }
+  .info-box.pulse{ animation:ipulse 0.9s ease-in-out infinite; }
+  @keyframes ipulse{ 0%,100%{ stroke:var(--cyan-glow);} 50%{ stroke:#ffffff;} }
 
-      .persona-group.reject .persona-pct .sep {
-        fill: #fff;
-        opacity: .8;
-      }
+  .tooltip{
+    position:absolute; pointer-events:none; z-index:30;
+    background:#050301; border:1px solid var(--orange);
+    box-shadow:0 0 16px rgba(247,131,0,0.3);
+    padding:10px 13px; max-width:270px;
+    font-size:12px; line-height:1.55;
+    opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s;
+  }
+  .tooltip.show{ opacity:1; transform:translateY(0); }
+  .tooltip .t-name{ font-family:'Orbitron',sans-serif; font-weight:700; font-size:12.5px; color:var(--orange); letter-spacing:1px; margin-bottom:4px; }
+  .tooltip .t-status{ font-size:11px; letter-spacing:1px; margin-bottom:6px; color:var(--orange-dim); }
+  .tooltip .t-status.approve{ color:#57e0c2; }
+  .tooltip .t-status.reject{ color:var(--red); }
+  .tooltip .t-reason{ color:#e0b064; }
 
-      .strut {
-        stroke: var(--orange);
-        stroke-width: 3;
-      }
+  /* bottom bar */
+  .bar-row{
+    display:flex; align-items:flex-start; gap:14px;
+    border-top:1px solid var(--orange-dim);
+    padding:18px 2px 20px;
+    font-size:14px;
+  }
+  .bar-label{ color:var(--orange); white-space:nowrap; letter-spacing:1px; padding-top:12px; }
+  .bar-fill{
+    flex:1; border:1px solid var(--orange-dim); min-height:88px; position:relative;
+    display:flex; align-items:center; padding:12px 16px;
+  }
+  #input{
+    width:100%; height:100%; min-height:64px; max-height:220px;
+    background:transparent; border:none; outline:none; resize:vertical;
+    color:var(--orange); font-family:'Share Tech Mono',monospace; font-size:17px; line-height:1.5;
+    caret-color:var(--orange);
+  }
+  #input::placeholder{ color:var(--orange-dim); }
+  .run-hint{
+    font-size:11px; color:var(--orange-dim); letter-spacing:1px; white-space:nowrap; padding-top:12px;
+  }
+  .run-hint.ready{ color:var(--orange); animation:blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0.25; } }
 
-      .frame-rule {
-        stroke: var(--orange);
-        stroke-width: 2;
-        fill: none;
-      }
+  /* console log */
+  .log{
+    border:1px solid var(--orange-dim); margin:12px 0 16px; padding:12px 8px 12px 14px;
+    font-size:12.5px; line-height:1.75; min-height:110px; max-height:240px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:var(--orange-dim) transparent;
+  }
+  .log::-webkit-scrollbar{ width:7px; }
+  .log::-webkit-scrollbar-track{ background:transparent; }
+  .log::-webkit-scrollbar-thumb{ background:var(--orange-dim); border-radius:3px; }
+  .log::-webkit-scrollbar-thumb:hover{ background:var(--orange); }
+  .log-line{ color:#e0b064; padding-right:6px; }
+  .log-line b{ color:var(--orange); }
+  .log-line.approve b{ color:#57e0c2; }
+  .log-line.reject b{ color:var(--red); }
+  .log-empty{ color:var(--orange-dim); }
+  .verdict-line{ margin-top:6px; padding-top:8px; border-top:1px dashed var(--orange-dim); font-size:13px; letter-spacing:1px; }
+  .verdict-line b{ font-size:15px; }
+  .verdict-line.approve b{ color:#57e0c2; text-shadow:0 0 8px rgba(87,224,194,.7); }
+  .verdict-line.reject b{ color:var(--red); text-shadow:0 0 8px rgba(255,43,31,.7); }
+</style>
+</head>
+<body>
+<div class="screen"><div class="screen-inner">
 
-      .dbl-line {
-        stroke: var(--orange);
-        stroke-width: 2;
-      }
+  <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="hazard" width="26" height="26" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+        <rect width="26" height="26" fill="#1a0000"/>
+        <rect width="13" height="26" fill="#ff2b1f"/>
+      </pattern>
+    </defs>
 
-      .persona-pct {
-        font-family: 'Share Tech Mono', monospace;
-        font-weight: 700;
-        font-size: 15px;
-        text-anchor: middle;
-        letter-spacing: 0.5px;
-      }
+    <!-- header kanji -->
+    <text x="34" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">質問</text>
+    <line x1="34" y1="108" x2="268" y2="108" class="dbl-line"/>
+    <line x1="34" y1="115" x2="268" y2="115" class="dbl-line"/>
 
-      .persona-pct .a {
-        fill: #0a3b2e;
-      }
+    <text x="530" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">解決</text>
+    <line x1="530" y1="108" x2="765" y2="108" class="dbl-line"/>
+    <line x1="530" y1="115" x2="765" y2="115" class="dbl-line"/>
 
-      .persona-pct .r {
-        fill: #3a0300;
-      }
+    <!-- left readout block -->
+    <text x="34" y="138" class="readout-text"><tspan id="ro-code">CODE:473</tspan></text>
+    <text x="34" y="153" class="readout-text" font-size="11"><tspan id="ro-file">FILE:MAGI_SYS</tspan></text>
+    <text x="34" y="167" class="readout-text" font-size="11"><tspan id="ro-ext">EXTENTION:3023</tspan></text>
+    <text x="34" y="181" class="readout-text" font-size="11"><tspan id="ro-mode">EX_MODE:OFF</tspan></text>
+    <text x="34" y="195" class="readout-text" font-size="11"><tspan id="ro-pri">PRIORITY:AAA</tspan></text>
 
-      .persona-pct .sep {
-        fill: #07181c;
-        opacity: .5;
-      }
+    <!-- info box -->
+    <rect id="infobox" x="686" y="138" width="80" height="46" class="info-box"/>
+    <text x="726" y="168" class="info-box-txt" text-anchor="middle">情報</text>
 
-      .persona-status {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 2px;
-        text-anchor: middle;
-        fill: #07181c;
-        opacity: .75;
-      }
+    <!-- struts -->
+    <line x1="272" y1="216" x2="292" y2="205" class="strut"/>
+    <line x1="528" y1="216" x2="508" y2="205" class="strut"/>
+    <line x1="392" y1="248" x2="392" y2="300" class="strut"/>
+    <line x1="408" y1="248" x2="408" y2="300" class="strut"/>
 
-      .info-box {
-        fill: #020806;
-        stroke: var(--cyan-glow);
-        stroke-width: 2;
-      }
+    <!-- BALTHASAR (top) -->
+    <g class="persona-group" id="group-balthasar" data-key="balthasar">
+      <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209"/>
+      <text x="400" y="130" class="persona-name">BALTHASAR&#8226;2</text>
+      <text x="400" y="152" class="persona-status" id="status-balthasar">the mother</text>
+      <text x="400" y="178" class="persona-pct" id="pct-balthasar"></text>
+    </g>
 
-      .info-box.pulse {
-        animation: ipulse 0.9s ease-in-out infinite;
-      }
+    <!-- CASPER (bottom left) -->
+    <g class="persona-group" id="group-casper" data-key="casper">
+      <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386"/>
+      <text x="150" y="300" class="persona-name">CASPER&#8226;3</text>
+      <text x="150" y="322" class="persona-status" id="status-casper">the woman</text>
+      <text x="150" y="348" class="persona-pct" id="pct-casper"></text>
+    </g>
 
-      @keyframes ipulse {
+    <!-- MELCHIOR (bottom right) -->
+    <g class="persona-group" id="group-melchior" data-key="melchior">
+      <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316"/>
+      <text x="650" y="300" class="persona-name">MELCHIOR&#8226;1</text>
+      <text x="650" y="322" class="persona-status" id="status-melchior">the scientist</text>
+      <text x="650" y="348" class="persona-pct" id="pct-melchior"></text>
+    </g>
 
-        0%,
-        100% {
-          stroke: var(--cyan-glow);
-        }
+    <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
+  </svg>
 
-        50% {
-          stroke: #ffffff;
-        }
-      }
+  <div class="log" id="log">
+    <div class="log-empty" id="log-empty">&gt; awaiting proposal_</div>
+  </div>
 
-      .tooltip {
-        position: absolute;
-        pointer-events: none;
-        z-index: 30;
-        background: #050301;
-        border: 1px solid var(--orange);
-        box-shadow: 0 0 16px rgba(247, 131, 0, 0.3);
-        padding: 10px 13px;
-        max-width: 270px;
-        font-size: 12px;
-        line-height: 1.55;
-        opacity: 0;
-        transform: translateY(4px);
-        transition: opacity .12s, transform .12s;
-      }
-
-      .tooltip.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .tooltip .t-name {
-        font-family: 'Orbitron', sans-serif;
-        font-weight: 700;
-        font-size: 12.5px;
-        color: var(--orange);
-        letter-spacing: 1px;
-        margin-bottom: 4px;
-      }
-
-      .tooltip .t-status {
-        font-size: 11px;
-        letter-spacing: 1px;
-        margin-bottom: 6px;
-        color: var(--orange-dim);
-      }
-
-      .tooltip .t-status.approve {
-        color: #57e0c2;
-      }
-
-      .tooltip .t-status.reject {
-        color: var(--red);
-      }
-
-      .tooltip .t-reason {
-        color: #e0b064;
-      }
-
-      /* bottom bar */
-      .bar-row {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        border-top: 1px solid var(--orange-dim);
-        padding: 18px 2px 20px;
-        font-size: 14px;
-      }
-
-      .bar-label {
-        color: var(--orange);
-        white-space: nowrap;
-        letter-spacing: 1px;
-      }
-
-      .bar-fill {
-        flex: 1;
-        border: 1px solid var(--orange-dim);
-        height: 48px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding: 0 16px;
-        overflow: hidden;
-      }
-
-      #input {
-        width: 100%;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: var(--orange);
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 17px;
-        caret-color: var(--orange);
-      }
-
-      #input::placeholder {
-        color: var(--orange-dim);
-      }
-
-      .run-hint {
-        font-size: 11px;
-        color: var(--orange-dim);
-        letter-spacing: 1px;
-        white-space: nowrap;
-      }
-
-      .run-hint.ready {
-        color: var(--orange);
-        animation: blink 1s step-end infinite;
-      }
-
-      @keyframes blink {
-        50% {
-          opacity: 0.25;
-        }
-      }
-
-      /* console log */
-      .log {
-        border: 1px solid var(--orange-dim);
-        margin: 12px 0 16px;
-        padding: 12px 8px 12px 14px;
-        font-size: 12.5px;
-        line-height: 1.75;
-        min-height: 110px;
-        max-height: 240px;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--orange-dim) transparent;
-      }
-
-      .log::-webkit-scrollbar {
-        width: 7px;
-      }
-
-      .log::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      .log::-webkit-scrollbar-thumb {
-        background: var(--orange-dim);
-        border-radius: 3px;
-      }
-
-      .log::-webkit-scrollbar-thumb:hover {
-        background: var(--orange);
-      }
-
-      .log-line {
-        color: #e0b064;
-        padding-right: 6px;
-      }
-
-      .log-line b {
-        color: var(--orange);
-      }
-
-      .log-line.approve b {
-        color: #57e0c2;
-      }
-
-      .log-line.reject b {
-        color: var(--red);
-      }
-
-      .log-empty {
-        color: var(--orange-dim);
-      }
-
-      .verdict-line {
-        margin-top: 6px;
-        padding-top: 8px;
-        border-top: 1px dashed var(--orange-dim);
-        font-size: 13px;
-        letter-spacing: 1px;
-      }
-
-      .verdict-line b {
-        font-size: 15px;
-      }
-
-      .verdict-line.approve b {
-        color: #57e0c2;
-        text-shadow: 0 0 8px rgba(87, 224, 194, .7);
-      }
-
-      .verdict-line.reject b {
-        color: var(--red);
-        text-shadow: 0 0 8px rgba(255, 43, 31, .7);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="screen">
-      <div class="screen-inner">
-        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hazard" width="26" height="26" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-              <rect width="26" height="26" fill="#1a0000" />
-              <rect width="13" height="26" fill="#ff2b1f" />
-            </pattern>
-          </defs>
-          <!-- header kanji -->
-          <text x="34" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">質問</text>
-          <line x1="34" y1="108" x2="268" y2="108" class="dbl-line" />
-          <line x1="34" y1="115" x2="268" y2="115" class="dbl-line" />
-          <text x="530" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">解決</text>
-          <line x1="530" y1="108" x2="765" y2="108" class="dbl-line" />
-          <line x1="530" y1="115" x2="765" y2="115" class="dbl-line" />
-          <!-- left readout block -->
-          <text x="34" y="138" class="readout-text">
-            <tspan id="ro-code">CODE:473</tspan>
-          </text>
-          <text x="34" y="153" class="readout-text" font-size="11">
-            <tspan id="ro-file">FILE:MAGI_SYS</tspan>
-          </text>
-          <text x="34" y="167" class="readout-text" font-size="11">
-            <tspan id="ro-ext">EXTENTION:3023</tspan>
-          </text>
-          <text x="34" y="181" class="readout-text" font-size="11">
-            <tspan id="ro-mode">EX_MODE:OFF</tspan>
-          </text>
-          <text x="34" y="195" class="readout-text" font-size="11">
-            <tspan id="ro-pri">PRIORITY:AAA</tspan>
-          </text>
-          <!-- info box -->
-          <rect id="infobox" x="686" y="138" width="80" height="46" class="info-box" />
-          <text x="726" y="168" class="info-box-txt" text-anchor="middle">情報</text>
-          <!-- struts -->
-          <line x1="272" y1="216" x2="292" y2="205" class="strut" />
-          <line x1="528" y1="216" x2="508" y2="205" class="strut" />
-          <line x1="392" y1="248" x2="392" y2="300" class="strut" />
-          <line x1="408" y1="248" x2="408" y2="300" class="strut" />
-          <!-- BALTHASAR (top) -->
-          <g class="persona-group" id="group-balthasar" data-key="balthasar">
-            <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209" />
-            <text x="400" y="130" class="persona-name">BALTHASAR&#8226;2</text>
-            <text x="400" y="152" class="persona-status" id="status-balthasar">the mother</text>
-            <text x="400" y="178" class="persona-pct" id="pct-balthasar"></text>
-          </g>
-          <!-- CASPER (bottom left) -->
-          <g class="persona-group" id="group-casper" data-key="casper">
-            <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386" />
-            <text x="150" y="300" class="persona-name">CASPER&#8226;3</text>
-            <text x="150" y="322" class="persona-status" id="status-casper">the woman</text>
-            <text x="150" y="348" class="persona-pct" id="pct-casper"></text>
-          </g>
-          <!-- MELCHIOR (bottom right) -->
-          <g class="persona-group" id="group-melchior" data-key="melchior">
-            <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316" />
-            <text x="650" y="300" class="persona-name">MELCHIOR&#8226;1</text>
-            <text x="650" y="322" class="persona-status" id="status-melchior">the scientist</text>
-            <text x="650" y="348" class="persona-pct" id="pct-melchior"></text>
-          </g>
-          <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
-        </svg>
-        <div class="log" id="log">
-          <div class="log-empty" id="log-empty">&gt; awaiting proposal_</div>
-        </div>
-        <div class="bar-row">
-          <span class="bar-label">input:</span>
-          <div class="bar-fill">
-            <input id="input" type="text" placeholder="enter a proposal for the three personalities…" autocomplete="off">
-          </div>
-          <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
-        </div>
-        <div class="tooltip" id="tooltip">
-          <div class="t-name" id="t-name"></div>
-          <div class="t-status" id="t-status"></div>
-          <div class="t-reason" id="t-reason"></div>
-        </div>
-      </div>
+  <div class="bar-row">
+    <span class="bar-label">input:</span>
+    <div class="bar-fill">
+      <textarea id="input" rows="3" placeholder="enter a proposal for the three personalities…"></textarea>
     </div>
-    <script src="/modules.js" defer></script>
-  </body>
+    <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
+  </div>
+
+  <div class="tooltip" id="tooltip">
+    <div class="t-name" id="t-name"></div>
+    <div class="t-status" id="t-status"></div>
+    <div class="t-reason" id="t-reason"></div>
+  </div>
+
+</div></div>
+
+<script src="/modules.js" defer></script>
+</body>
 </html>
