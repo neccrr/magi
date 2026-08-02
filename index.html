@@ -1,395 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MAGI SYSTEM</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Noto+Serif+JP:wght@700;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --orange:#f78300;
-    --orange-dim:#7a4200;
-    --cyan:#45b6da;
-    --cyan-dk:#1c5c72;
-    --cyan-glow:#8fe3ff;
-    --red:#ff2b1f;
-    --bg:#020100;
-    --ink:#0a1214;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);}
-  body{
-    font-family:'Share Tech Mono',monospace;
-    color:var(--orange);
-    min-height:100vh;
-    display:flex; align-items:center; justify-content:center;
-    padding:10px;
-  }
-  .screen{
-    width:100%; max-width:1180px;
-    border:2px solid var(--orange);
-    box-shadow:0 0 0 1px #000, 0 0 22px rgba(247,131,0,0.25), inset 0 0 30px rgba(247,131,0,0.04);
-    padding:6px;
-    background:var(--bg);
-  }
-  .screen-inner{
-    border:1px solid var(--orange-dim);
-    padding:14px 16px 0;
-    position:relative;
-  }
-  svg{display:block; width:100%; height:auto;}
-  text{font-family:'Share Tech Mono',monospace;}
-
-  /* header kanji */
-  .kanji{
-    font-family:'Noto Sans JP','Noto Serif JP',sans-serif;
-    font-weight:700;
-    fill:var(--orange);
-  }
-  .kanji-glow{ filter:drop-shadow(0 0 4px rgba(247,131,0,0.6)); }
-
-  .readout-text{ font-family:'Share Tech Mono',monospace; font-size:12.5px; fill:var(--orange); }
-  .readout-text tspan{ fill:var(--orange); }
-
-  .info-box-txt{ font-family:'Noto Sans JP',sans-serif; font-weight:700; fill:var(--cyan-glow); font-size:20px; }
-
-  .persona-name{
-    font-family:'Orbitron',sans-serif; font-weight:800; font-size:23px;
-    fill:#07181c; letter-spacing:1px; text-anchor:middle;
-  }
-  .persona-role{
-    font-family:'Share Tech Mono',monospace; font-size:11px; fill:#0d2b33; text-anchor:middle; letter-spacing:2px;
-  }
-  .magi-text{
-    font-family:'Noto Serif JP',serif; font-weight:900; font-style:italic; font-size:26px;
-    fill:var(--orange); text-anchor:middle;
-  }
-
-  .panel{
-    stroke:#000; stroke-width:7; stroke-linejoin:round;
-    fill:var(--cyan);
-    filter:drop-shadow(0 0 6px rgba(69,182,218,0.35));
-    transition:fill .35s;
-  }
-  .panel.processing{ fill:var(--cyan); animation:flicker 1s ease-in-out infinite; }
-  @keyframes flicker{ 0%,100%{opacity:1;} 50%{opacity:.72;} }
-  .panel.approve{ fill:#57e0c2; filter:drop-shadow(0 0 10px rgba(87,224,194,0.65)); }
-  .panel.reject{ fill:url(#hazard); }
-
-  .strut{ stroke:var(--orange); stroke-width:3; }
-  .frame-rule{ stroke:var(--orange); stroke-width:2; fill:none; }
-  .dbl-line{ stroke:var(--orange); stroke-width:2; }
-
-  .persona-pct{
-    font-family:'Share Tech Mono',monospace; font-weight:700; font-size:15px;
-    text-anchor:middle; letter-spacing:0.5px;
-  }
-  .persona-pct .a{ fill:#0a3b2e; }
-  .persona-pct .r{ fill:#3a0300; }
-  .persona-pct .sep{ fill:#07181c; opacity:.5; }
-  .persona-status{
-    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px;
-    text-anchor:middle; fill:#07181c; opacity:.75;
-  }
-
-  .info-box{ fill:#020806; stroke:var(--cyan-glow); stroke-width:2; }
-  .info-box.pulse{ animation:ipulse 0.9s ease-in-out infinite; }
-  @keyframes ipulse{ 0%,100%{ stroke:var(--cyan-glow);} 50%{ stroke:#ffffff;} }
-
-  /* bottom bars, outside svg */
-  .bar-row{
-    display:flex; align-items:center; gap:12px;
-    border-top:1px solid var(--orange-dim);
-    padding:11px 2px;
-    font-size:13.5px;
-  }
-  .bar-row:last-of-type{ padding-bottom:14px; }
-  .bar-label{ color:var(--orange); white-space:nowrap; letter-spacing:1px; }
-  .bar-fill{
-    flex:1; border:1px solid var(--orange-dim); height:20px; position:relative;
-    display:flex; align-items:center; padding:0 8px; overflow:hidden;
-  }
-  .dotted{ color:var(--orange-dim); letter-spacing:2px; font-size:13px; user-select:none; white-space:nowrap; overflow:hidden; }
-  #question{
-    width:100%; background:transparent; border:none; outline:none;
-    color:var(--orange); font-family:'Share Tech Mono',monospace; font-size:14px;
-    caret-color:var(--orange);
-  }
-  #question::placeholder{ color:var(--orange-dim); }
-  .run-hint{
-    font-size:10.5px; color:var(--orange-dim); letter-spacing:1px; white-space:nowrap;
-  }
-  .run-hint.ready{ color:var(--orange); animation:blink 1s step-end infinite; }
-  @keyframes blink{ 50%{ opacity:0.25; } }
-
-  /* console log */
-  .log{
-    border:1px solid var(--orange-dim); margin:12px 0 16px; padding:12px 14px;
-    font-size:12.5px; line-height:1.75; min-height:110px; max-height:240px; overflow-y:auto;
-  }
-  .log-line{ color:#e0b064; }
-  .log-line b{ color:var(--orange); }
-  .log-line.approve b{ color:#57e0c2; }
-  .log-line.reject b{ color:var(--red); }
-  .log-empty{ color:var(--orange-dim); }
-  .verdict-line{ margin-top:6px; padding-top:8px; border-top:1px dashed var(--orange-dim); font-size:13px; letter-spacing:1px; }
-  .verdict-line b{ font-size:15px; }
-  .verdict-line.approve b{ color:#57e0c2; text-shadow:0 0 8px rgba(87,224,194,.7); }
-  .verdict-line.reject b{ color:var(--red); text-shadow:0 0 8px rgba(255,43,31,.7); }
-</style>
-</head>
-<body>
-<div class="screen"><div class="screen-inner">
-
-  <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="hazard" width="26" height="26" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-        <rect width="26" height="26" fill="#1a0000"/>
-        <rect width="13" height="26" fill="#ff2b1f"/>
-      </pattern>
-    </defs>
-
-    <!-- header kanji -->
-    <text x="34" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">質問</text>
-    <line x1="34" y1="108" x2="268" y2="108" class="dbl-line"/>
-    <line x1="34" y1="115" x2="268" y2="115" class="dbl-line"/>
-
-    <text x="530" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">解決</text>
-    <line x1="530" y1="108" x2="765" y2="108" class="dbl-line"/>
-    <line x1="530" y1="115" x2="765" y2="115" class="dbl-line"/>
-
-    <!-- left readout block -->
-    <text x="34" y="138" class="readout-text"><tspan id="ro-code">CODE:473</tspan></text>
-    <text x="34" y="153" class="readout-text" font-size="11"><tspan id="ro-file">FILE:MAGI_SYS</tspan></text>
-    <text x="34" y="167" class="readout-text" font-size="11"><tspan id="ro-ext">EXTENTION:3023</tspan></text>
-    <text x="34" y="181" class="readout-text" font-size="11"><tspan id="ro-mode">EX_MODE:OFF</tspan></text>
-    <text x="34" y="195" class="readout-text" font-size="11"><tspan id="ro-pri">PRIORITY:AAA</tspan></text>
-
-    <!-- info box -->
-    <rect id="infobox" x="686" y="138" width="80" height="46" class="info-box"/>
-    <text x="726" y="168" class="info-box-txt" text-anchor="middle">情報</text>
-
-    <!-- struts -->
-    <line x1="272" y1="216" x2="292" y2="205" class="strut"/>
-    <line x1="528" y1="216" x2="508" y2="205" class="strut"/>
-    <line x1="392" y1="248" x2="392" y2="300" class="strut"/>
-    <line x1="408" y1="248" x2="408" y2="300" class="strut"/>
-
-    <!-- BALTHASAR (top) -->
-    <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209"/>
-    <text x="400" y="130" class="persona-name">BALTHASAR&#8226;2</text>
-    <text x="400" y="152" class="persona-status" id="status-balthasar">the mother</text>
-    <text x="400" y="178" class="persona-pct" id="pct-balthasar"></text>
-
-    <!-- CASPER (bottom left) -->
-    <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386"/>
-    <text x="150" y="300" class="persona-name">CASPER&#8226;3</text>
-    <text x="150" y="322" class="persona-status" id="status-casper">the woman</text>
-    <text x="150" y="348" class="persona-pct" id="pct-casper"></text>
-
-    <!-- MELCHIOR (bottom right) -->
-    <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316"/>
-    <text x="650" y="300" class="persona-name">MELCHIOR&#8226;1</text>
-    <text x="650" y="322" class="persona-status" id="status-melchior">the scientist</text>
-    <text x="650" y="348" class="persona-pct" id="pct-melchior"></text>
-
-    <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
-  </svg>
-
-  <div class="log" id="log">
-    <div class="log-empty" id="log-empty">&gt; awaiting proposal_</div>
-  </div>
-
-  <div class="bar-row">
-    <span class="bar-label">access&nbsp;code:</span>
-    <div class="bar-fill"><span class="dotted" id="access-code">••••••••••••••••••••••••••••••••••••••••••••••••</span></div>
-  </div>
-  <div class="bar-row">
-    <span class="bar-label">input:</span>
-    <div class="bar-fill">
-      <input id="question" type="text" placeholder="enter proposal or decision to deliberate" autocomplete="off">
-    </div>
-    <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
-  </div>
-
-</div></div>
-
-<script>
-  const DEFAULT_MODEL = 'agnes-2.0-flash';
-
-  const personas = {
-    melchior: {
-      label: 'MELCHIOR-1',
-      system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
-    },
-    balthasar: {
-      label: 'BALTHASAR-2',
-      system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
-    },
-    casper: {
-      label: 'CASPER-3',
-      system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
-    }
-  };
-
-  const questionEl = document.getElementById('question');
-  const runHint = document.getElementById('run-hint');
-  const logEl = document.getElementById('log');
-  const logEmpty = document.getElementById('log-empty');
-  const infobox = document.getElementById('infobox');
-  const magiLabel = document.getElementById('magi-label');
-  const roMode = document.getElementById('ro-mode');
-  const roPri = document.getElementById('ro-pri');
-  const accessCode = document.getElementById('access-code');
-
-  let running = false;
-
-  function extractJSON(text) {
-    let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-    try { JSON.parse(cleaned); return cleaned; } catch (_) {
-      const a = cleaned.indexOf('{'), b = cleaned.lastIndexOf('}');
-      if (a !== -1 && b !== -1 && b > a) {
-        const candidate = cleaned.substring(a, b + 1);
-        JSON.parse(candidate);
-        return candidate;
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MAGI SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Noto+Serif+JP:wght@700;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --orange: #f78300;
+        --orange-dim: #7a4200;
+        --cyan: #45b6da;
+        --cyan-dk: #1c5c72;
+        --cyan-glow: #8fe3ff;
+        --red: #ff2b1f;
+        --bg: #020100;
+        --ink: #0a1214;
       }
-      throw new Error('No JSON object found: ' + text.substring(0, 200));
-    }
-  }
 
-  function setPanel(key, state) {
-    document.getElementById('panel-' + key).setAttribute('class', 'panel ' + state);
-  }
+      * {
+        box-sizing: border-box;
+      }
 
-  function setStatus(key, text) {
-    document.getElementById('status-' + key).textContent = text;
-  }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+      }
 
-  function setPct(key, pct) {
-    const el = document.getElementById('pct-' + key);
-    if (pct === null) { el.textContent = ''; return; }
-    el.innerHTML = '<tspan class="a">' + pct + '%</tspan><tspan class="sep"> / </tspan><tspan class="r">' + (100 - pct) + '%</tspan>';
-  }
+      body {
+        font-family: 'Share Tech Mono', monospace;
+        color: var(--orange);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+      }
 
-  function splitLabel(pct) {
-    return pct + '% approve / ' + (100 - pct) + '% reject';
-  }
+      .screen {
+        width: 100%;
+        max-width: 1180px;
+        border: 2px solid var(--orange);
+        box-shadow: 0 0 0 1px #000, 0 0 22px rgba(247, 131, 0, 0.25), inset 0 0 30px rgba(247, 131, 0, 0.04);
+        padding: 6px;
+        background: var(--bg);
+      }
 
-  function addLog(label, pct, reasoning, cls) {
-    if (logEmpty) logEmpty.remove();
-    const line = document.createElement('div');
-    line.className = 'log-line' + (cls ? (' ' + cls) : '');
-    const pctStr = pct !== null ? (' [' + splitLabel(pct) + ']') : '';
-    line.innerHTML = '&gt; <b>' + label + pctStr + '</b> — ' + reasoning;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
+      .screen-inner {
+        border: 1px solid var(--orange-dim);
+        padding: 14px 16px 0;
+        position: relative;
+      }
 
-  async function askPersona(key, proposal) {
-    const p = personas[key];
-    setPanel(key, 'processing');
-    setStatus(key, 'analyzing…');
-    setPct(key, null);
+      svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
 
-    try {
-      const response = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: DEFAULT_MODEL,
-          messages: [
-            { role: 'system', content: p.system },
-            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-          ]
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || data.error || ('HTTP ' + response.status));
+      text {
+        font-family: 'Share Tech Mono', monospace;
+      }
 
-      const raw = data.choices?.[0]?.message?.content || '';
-      if (!raw) throw new Error('empty response');
-      const parsed = JSON.parse(extractJSON(raw));
+      /* header kanji */
+      .kanji {
+        font-family: 'Noto Sans JP', 'Noto Serif JP', sans-serif;
+        font-weight: 700;
+        fill: var(--orange);
+      }
 
-      let pct = Math.round(Number(parsed.approve_pct));
-      if (isNaN(pct)) pct = 50;
-      pct = Math.max(0, Math.min(100, pct));
+      .kanji-glow {
+        filter: drop-shadow(0 0 4px rgba(247, 131, 0, 0.6));
+      }
 
-      const approve = pct >= 50;
-      setPanel(key, approve ? 'approve' : 'reject');
-      setStatus(key, approve ? 'approved' : 'rejected');
-      setPct(key, pct);
-      addLog(p.label, pct, parsed.reasoning || '(no reasoning)', approve ? 'approve' : 'reject');
-      return pct;
-    } catch (err) {
-      setPanel(key, 'reject');
-      setStatus(key, 'link error');
-      setPct(key, null);
-      addLog(p.label, null, 'LINK ERROR — ' + (err.message || err), 'reject');
-      return null;
-    }
-  }
+      .readout-text {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12.5px;
+        fill: var(--orange);
+      }
 
-  function finalize(votes) {
-    const valid = votes.filter(v => v !== null);
-    const verdictDiv = document.createElement('div');
-    if (!valid.length) {
-      verdictDiv.className = 'verdict-line reject';
-      verdictDiv.innerHTML = 'CONSENSUS: <b>FAILED — ALL NODES UNREACHABLE</b>';
-      logEl.appendChild(verdictDiv);
-      magiLabel.style.fill = 'var(--red)';
-      return;
-    }
-    const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
-    const approve = avg >= 50;
-    verdictDiv.className = 'verdict-line ' + (approve ? 'approve' : 'reject');
-    verdictDiv.innerHTML = 'CONSENSUS: <b>' + splitLabel(avg) + ' — ' + (approve ? 'APPROVED' : 'REJECTED') + '</b> &nbsp;(' + valid.length + '/3 reporting)';
-    logEl.appendChild(verdictDiv);
-    logEl.scrollTop = logEl.scrollHeight;
-    magiLabel.style.fill = approve ? '#57e0c2' : 'var(--red)';
-    magiLabel.style.filter = 'drop-shadow(0 0 8px ' + (approve ? 'rgba(87,224,194,.8)' : 'rgba(255,43,31,.8)') + ')';
-  }
+      .readout-text tspan {
+        fill: var(--orange);
+      }
 
-  async function runDeliberation() {
-    const proposal = questionEl.value.trim();
-    if (!proposal || running) { questionEl.focus(); return; }
-    running = true;
-    questionEl.disabled = true;
-    runHint.textContent = '[DELIBERATING…]';
-    runHint.className = 'run-hint';
-    infobox.classList.add('pulse');
-    roMode.textContent = 'EX_MODE:ON';
-    roPri.textContent = 'PRIORITY:AAA*';
-    accessCode.textContent = 'COMPUTING' + '.'.repeat(30);
-    magiLabel.style.fill = '';
-    magiLabel.style.filter = '';
+      .info-box-txt {
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 700;
+        fill: var(--cyan-glow);
+        font-size: 20px;
+      }
 
-    logEl.innerHTML = '';
-    ['melchior', 'balthasar', 'casper'].forEach(k => {
-      setPanel(k, '');
-      setStatus(k, 'standby');
-      setPct(k, null);
-    });
+      .persona-name {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 800;
+        font-size: 23px;
+        fill: #07181c;
+        letter-spacing: 1px;
+        text-anchor: middle;
+      }
 
-    const keys = Object.keys(personas);
-    const votes = await Promise.all(keys.map(k => askPersona(k, proposal)));
-    finalize(votes);
+      .persona-role {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        fill: #0d2b33;
+        text-anchor: middle;
+        letter-spacing: 2px;
+      }
 
-    infobox.classList.remove('pulse');
-    roMode.textContent = 'EX_MODE:OFF';
-    roPri.textContent = 'PRIORITY:AAA';
-    accessCode.textContent = '•'.repeat(50);
-    runHint.textContent = '[ENTER TO RUN]';
-    runHint.className = 'run-hint ready';
-    questionEl.disabled = false;
-    running = false;
-  }
+      .magi-text {
+        font-family: 'Noto Serif JP', serif;
+        font-weight: 900;
+        font-style: italic;
+        font-size: 26px;
+        fill: var(--orange);
+        text-anchor: middle;
+      }
 
-  questionEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); runDeliberation(); }
-  });
-  questionEl.addEventListener('input', () => {
-    runHint.className = questionEl.value.trim() ? 'run-hint ready' : 'run-hint';
-  });
-</script>
-</body>
+      .persona-group .panel {
+        stroke: #000;
+        stroke-width: 7;
+        stroke-linejoin: round;
+        fill: var(--cyan);
+        filter: drop-shadow(0 0 6px rgba(69, 182, 218, 0.35));
+        transition: fill .35s;
+        cursor: pointer;
+      }
+
+      .persona-group.processing .panel {
+        animation: flicker 1s ease-in-out infinite;
+      }
+
+      @keyframes flicker {
+
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: .72;
+        }
+      }
+
+      .persona-group.approve .panel {
+        fill: #57e0c2;
+        filter: drop-shadow(0 0 10px rgba(87, 224, 194, 0.65));
+      }
+
+      .persona-group.reject .panel {
+        fill: url(#hazard);
+        filter: drop-shadow(0 0 10px rgba(255, 43, 31, 0.55));
+      }
+
+      .persona-group:hover .panel {
+        filter: brightness(1.15) drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+      }
+
+      /* reject uses red/black hazard stripes underneath — switch text to a light,
+     outlined treatment there so it stays legible; every other state keeps
+     the dark navy text on the light cyan/mint fill. */
+      .persona-group.reject .persona-name {
+        fill: #fff8e8;
+        text-shadow: 0 0 3px #000, 0 0 6px #000;
+      }
+
+      .persona-group.reject .persona-status {
+        fill: #ffe3c2;
+        opacity: 1;
+        text-shadow: 0 0 3px #000;
+      }
+
+      .persona-group.reject .persona-pct .a {
+        fill: #7dffc9;
+        text-shadow: 0 0 3px #000;
+      }
+
+      .persona-group.reject .persona-pct .r {
+        fill: #fff;
+        text-shadow: 0 0 3px #000;
+      }
+
+      .persona-group.reject .persona-pct .sep {
+        fill: #fff;
+        opacity: .8;
+      }
+
+      .strut {
+        stroke: var(--orange);
+        stroke-width: 3;
+      }
+
+      .frame-rule {
+        stroke: var(--orange);
+        stroke-width: 2;
+        fill: none;
+      }
+
+      .dbl-line {
+        stroke: var(--orange);
+        stroke-width: 2;
+      }
+
+      .persona-pct {
+        font-family: 'Share Tech Mono', monospace;
+        font-weight: 700;
+        font-size: 15px;
+        text-anchor: middle;
+        letter-spacing: 0.5px;
+      }
+
+      .persona-pct .a {
+        fill: #0a3b2e;
+      }
+
+      .persona-pct .r {
+        fill: #3a0300;
+      }
+
+      .persona-pct .sep {
+        fill: #07181c;
+        opacity: .5;
+      }
+
+      .persona-status {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-anchor: middle;
+        fill: #07181c;
+        opacity: .75;
+      }
+
+      .info-box {
+        fill: #020806;
+        stroke: var(--cyan-glow);
+        stroke-width: 2;
+      }
+
+      .info-box.pulse {
+        animation: ipulse 0.9s ease-in-out infinite;
+      }
+
+      @keyframes ipulse {
+
+        0%,
+        100% {
+          stroke: var(--cyan-glow);
+        }
+
+        50% {
+          stroke: #ffffff;
+        }
+      }
+
+      .tooltip {
+        position: absolute;
+        pointer-events: none;
+        z-index: 30;
+        background: #050301;
+        border: 1px solid var(--orange);
+        box-shadow: 0 0 16px rgba(247, 131, 0, 0.3);
+        padding: 10px 13px;
+        max-width: 270px;
+        font-size: 12px;
+        line-height: 1.55;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity .12s, transform .12s;
+      }
+
+      .tooltip.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .tooltip .t-name {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        font-size: 12.5px;
+        color: var(--orange);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+      }
+
+      .tooltip .t-status {
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+        color: var(--orange-dim);
+      }
+
+      .tooltip .t-status.approve {
+        color: #57e0c2;
+      }
+
+      .tooltip .t-status.reject {
+        color: var(--red);
+      }
+
+      .tooltip .t-reason {
+        color: #e0b064;
+      }
+
+      /* bottom bar */
+      .bar-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-top: 1px solid var(--orange-dim);
+        padding: 18px 2px 20px;
+        font-size: 14px;
+      }
+
+      .bar-label {
+        color: var(--orange);
+        white-space: nowrap;
+        letter-spacing: 1px;
+      }
+
+      .bar-fill {
+        flex: 1;
+        border: 1px solid var(--orange-dim);
+        height: 48px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        overflow: hidden;
+      }
+
+      #input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--orange);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 17px;
+        caret-color: var(--orange);
+      }
+
+      #input::placeholder {
+        color: var(--orange-dim);
+      }
+
+      .run-hint {
+        font-size: 11px;
+        color: var(--orange-dim);
+        letter-spacing: 1px;
+        white-space: nowrap;
+      }
+
+      .run-hint.ready {
+        color: var(--orange);
+        animation: blink 1s step-end infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0.25;
+        }
+      }
+
+      /* console log */
+      .log {
+        border: 1px solid var(--orange-dim);
+        margin: 12px 0 16px;
+        padding: 12px 8px 12px 14px;
+        font-size: 12.5px;
+        line-height: 1.75;
+        min-height: 110px;
+        max-height: 240px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--orange-dim) transparent;
+      }
+
+      .log::-webkit-scrollbar {
+        width: 7px;
+      }
+
+      .log::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .log::-webkit-scrollbar-thumb {
+        background: var(--orange-dim);
+        border-radius: 3px;
+      }
+
+      .log::-webkit-scrollbar-thumb:hover {
+        background: var(--orange);
+      }
+
+      .log-line {
+        color: #e0b064;
+        padding-right: 6px;
+      }
+
+      .log-line b {
+        color: var(--orange);
+      }
+
+      .log-line.approve b {
+        color: #57e0c2;
+      }
+
+      .log-line.reject b {
+        color: var(--red);
+      }
+
+      .log-empty {
+        color: var(--orange-dim);
+      }
+
+      .verdict-line {
+        margin-top: 6px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--orange-dim);
+        font-size: 13px;
+        letter-spacing: 1px;
+      }
+
+      .verdict-line b {
+        font-size: 15px;
+      }
+
+      .verdict-line.approve b {
+        color: #57e0c2;
+        text-shadow: 0 0 8px rgba(87, 224, 194, .7);
+      }
+
+      .verdict-line.reject b {
+        color: var(--red);
+        text-shadow: 0 0 8px rgba(255, 43, 31, .7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen">
+      <div class="screen-inner">
+        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hazard" width="26" height="26" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+              <rect width="26" height="26" fill="#1a0000" />
+              <rect width="13" height="26" fill="#ff2b1f" />
+            </pattern>
+          </defs>
+          <!-- header kanji -->
+          <text x="34" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">質問</text>
+          <line x1="34" y1="108" x2="268" y2="108" class="dbl-line" />
+          <line x1="34" y1="115" x2="268" y2="115" class="dbl-line" />
+          <text x="530" y="88" class="kanji kanji-glow" font-size="52" letter-spacing="16">解決</text>
+          <line x1="530" y1="108" x2="765" y2="108" class="dbl-line" />
+          <line x1="530" y1="115" x2="765" y2="115" class="dbl-line" />
+          <!-- left readout block -->
+          <text x="34" y="138" class="readout-text">
+            <tspan id="ro-code">CODE:473</tspan>
+          </text>
+          <text x="34" y="153" class="readout-text" font-size="11">
+            <tspan id="ro-file">FILE:MAGI_SYS</tspan>
+          </text>
+          <text x="34" y="167" class="readout-text" font-size="11">
+            <tspan id="ro-ext">EXTENTION:3023</tspan>
+          </text>
+          <text x="34" y="181" class="readout-text" font-size="11">
+            <tspan id="ro-mode">EX_MODE:OFF</tspan>
+          </text>
+          <text x="34" y="195" class="readout-text" font-size="11">
+            <tspan id="ro-pri">PRIORITY:AAA</tspan>
+          </text>
+          <!-- info box -->
+          <rect id="infobox" x="686" y="138" width="80" height="46" class="info-box" />
+          <text x="726" y="168" class="info-box-txt" text-anchor="middle">情報</text>
+          <!-- struts -->
+          <line x1="272" y1="216" x2="292" y2="205" class="strut" />
+          <line x1="528" y1="216" x2="508" y2="205" class="strut" />
+          <line x1="392" y1="248" x2="392" y2="300" class="strut" />
+          <line x1="408" y1="248" x2="408" y2="300" class="strut" />
+          <!-- BALTHASAR (top) -->
+          <g class="persona-group" id="group-balthasar" data-key="balthasar">
+            <polygon id="panel-balthasar" class="panel" points="280,36 521,36 521,209 400,254 280,209" />
+            <text x="400" y="130" class="persona-name">BALTHASAR&#8226;2</text>
+            <text x="400" y="152" class="persona-status" id="status-balthasar">the mother</text>
+            <text x="400" y="178" class="persona-pct" id="pct-balthasar"></text>
+          </g>
+          <!-- CASPER (bottom left) -->
+          <g class="persona-group" id="group-casper" data-key="casper">
+            <polygon id="panel-casper" class="panel" points="35,211 231,211 337,316 337,386 35,386" />
+            <text x="150" y="300" class="persona-name">CASPER&#8226;3</text>
+            <text x="150" y="322" class="persona-status" id="status-casper">the woman</text>
+            <text x="150" y="348" class="persona-pct" id="pct-casper"></text>
+          </g>
+          <!-- MELCHIOR (bottom right) -->
+          <g class="persona-group" id="group-melchior" data-key="melchior">
+            <polygon id="panel-melchior" class="panel" points="570,211 765,211 765,386 464,386 464,316" />
+            <text x="650" y="300" class="persona-name">MELCHIOR&#8226;1</text>
+            <text x="650" y="322" class="persona-status" id="status-melchior">the scientist</text>
+            <text x="650" y="348" class="persona-pct" id="pct-melchior"></text>
+          </g>
+          <text x="400" y="282" class="magi-text" id="magi-label">MAGI</text>
+        </svg>
+        <div class="log" id="log">
+          <div class="log-empty" id="log-empty">&gt; awaiting proposal_</div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">input:</span>
+          <div class="bar-fill">
+            <input id="input" type="text" placeholder="enter a proposal for the three personalities…" autocomplete="off">
+          </div>
+          <span class="run-hint" id="run-hint">[ENTER TO RUN]</span>
+        </div>
+        <div class="tooltip" id="tooltip">
+          <div class="t-name" id="t-name"></div>
+          <div class="t-status" id="t-status"></div>
+          <div class="t-reason" id="t-reason"></div>
+        </div>
+      </div>
+    </div>
+    <script src="/public/modules.js" defer></script>
+  </body>
 </html>
