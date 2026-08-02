@@ -1,21 +1,7 @@
-const DEFAULT_MODEL = 'agnes-2.0-flash';
-
-  const personas = {
-    melchior: {
-      label: 'MELCHIOR-1',
-      desc: 'the scientist — weighs logic, evidence, feasibility, and risk.',
-      system: `You are MELCHIOR-1, the "Scientist" personality within the MAGI triune decision system. You evaluate proposals purely through logic, evidence, feasibility, and risk analysis. You are dispassionate and analytical, weighing costs, probabilities, and second-order consequences. You are skeptical of appeals to emotion or tradition. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, terse and analytical"}`
-    },
-    balthasar: {
-      label: 'BALTHASAR-2',
-      desc: 'the mother — weighs care, protection, and long-term wellbeing.',
-      system: `You are BALTHASAR-2, the "Mother" personality within the MAGI triune decision system. You evaluate proposals through protectiveness, care, and long-term wellbeing of everyone affected, especially the vulnerable. You weigh nurture, safety, and consequences for relationships and people over pure logic. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, warm but firm"}`
-    },
-    casper: {
-      label: 'CASPER-3',
-      desc: 'the woman — weighs desire, intuition, and self-interest.',
-      system: `You are CASPER-3, the "Woman" personality within the MAGI triune decision system. You evaluate proposals through personal desire, intuition, self-interest, and human ambition. You ask what is actually wanted, what feels right, and what serves the individual, not just the collective. You are the most willing to take a bold or unconventional position. Respond ONLY with strict JSON, no markdown fences, no preamble: {"approve_pct": <integer 0-100, your confidence the proposal should be approved>, "reasoning": "2-3 sentences in character, direct and personal"}`
-    }
+const personas = {
+    melchior: { label: 'MELCHIOR-1', desc: 'the scientist — weighs logic, evidence, feasibility, and risk.' },
+    balthasar: { label: 'BALTHASAR-2', desc: 'the mother — weighs care, protection, and long-term wellbeing.' },
+    casper: { label: 'CASPER-3', desc: 'the woman — weighs desire, intuition, and self-interest.' }
   };
 
   const questionEl = document.getElementById('input');
@@ -39,19 +25,6 @@ const DEFAULT_MODEL = 'agnes-2.0-flash';
   };
 
   let running = false;
-
-  function extractJSON(text) {
-    let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-    try { JSON.parse(cleaned); return cleaned; } catch (_) {
-      const a = cleaned.indexOf('{'), b = cleaned.lastIndexOf('}');
-      if (a !== -1 && b !== -1 && b > a) {
-        const candidate = cleaned.substring(a, b + 1);
-        JSON.parse(candidate);
-        return candidate;
-      }
-      throw new Error('No JSON object found: ' + text.substring(0, 200));
-    }
-  }
 
   function setPanel(key, state) {
     document.getElementById('group-' + key).setAttribute('class', 'persona-group' + (state ? ' ' + state : ''));
@@ -124,33 +97,20 @@ const DEFAULT_MODEL = 'agnes-2.0-flash';
     personaState[key] = { status: 'analyzing…', pct: null, reasoning: null };
 
     try {
-      const response = await fetch('/api/proxy', {
+      const response = await fetch('/api/deliberate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: DEFAULT_MODEL,
-          messages: [
-            { role: 'system', content: p.system },
-            { role: 'user', content: 'Proposal for deliberation:\n\n' + proposal }
-          ]
-        })
+        body: JSON.stringify({ key, proposal })
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || data.error || ('HTTP ' + response.status));
+      if (!response.ok || data.error) throw new Error(data.error || ('HTTP ' + response.status));
 
-      const raw = data.choices?.[0]?.message?.content || '';
-      if (!raw) throw new Error('empty response');
-      const parsed = JSON.parse(extractJSON(raw));
-
-      let pct = Math.round(Number(parsed.approve_pct));
-      if (isNaN(pct)) pct = 50;
-      pct = Math.max(0, Math.min(100, pct));
-
+      const pct = data.pct;
       const approve = pct >= 50;
       setPanel(key, approve ? 'approve' : 'reject');
       setStatus(key, approve ? 'approved' : 'rejected');
       setPct(key, pct);
-      const reasoning = parsed.reasoning || '(no reasoning)';
+      const reasoning = data.reasoning || '(no reasoning)';
       personaState[key] = { status: approve ? 'approved' : 'rejected', pct, reasoning };
       addLog(p.label, pct, reasoning, approve ? 'approve' : 'reject');
       return pct;
